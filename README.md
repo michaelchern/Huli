@@ -1,3 +1,9 @@
+<div align="center">
+
+<img src="docs/image/readme-hero.webp" alt="Huli - a modern Vulkan renderer">
+
+</div>
+
 # Huli
 
 Huli is a C++20 / Vulkan learning repository.
