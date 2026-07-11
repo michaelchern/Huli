@@ -145,6 +145,27 @@ function Get-OrphanedEnglishDocuments {
     )
 }
 
+function Get-OrphanedEnglishSkills {
+    param([hashtable]$KnownTargets)
+
+    $skillsRoot = Get-AbsoluteRepoPath ".agents/skills"
+    if (-not (Test-Path -LiteralPath $skillsRoot)) {
+        return @()
+    }
+
+    return @(
+        Get-ChildItem -LiteralPath $skillsRoot -Directory |
+            ForEach-Object {
+                $targetPath = Join-Path $_.FullName "SKILL.md"
+                if (Test-Path -LiteralPath $targetPath) {
+                    ConvertTo-RepoPath $targetPath
+                }
+            } |
+            Where-Object { -not $KnownTargets.ContainsKey($_) } |
+            Sort-Object
+    )
+}
+
 $syncPairs = @(
     New-SyncPair "AGENTS.zh-CN.md" "AGENTS.md" "AGENTS_ZH_CN_SHA256" "root AGENTS"
 )
@@ -160,6 +181,7 @@ foreach ($pair in $syncPairs) {
 $orphanedTargets = @()
 $orphanedTargets += Get-OrphanedEnglishDocuments "docs/agents" $knownTargets
 $orphanedTargets += Get-OrphanedEnglishDocuments "docs/tasks" $knownTargets
+$orphanedTargets += Get-OrphanedEnglishSkills $knownTargets
 
 function Get-SyncState {
     param([hashtable]$Pair)
@@ -235,7 +257,7 @@ if ($Check) {
     }
 
     foreach ($target in $orphanedTargets) {
-        Write-Host "$target has no matching Chinese source under a zh-CN directory."
+        Write-Host "$target has no matching Chinese source file."
     }
 
     if ($failed.Count -gt 0 -or $orphanedTargets.Count -gt 0) {
@@ -261,7 +283,7 @@ $promptLines = @(
     '',
     'Rules:',
     '- Treat Chinese files as the source of truth.',
-    '- Create a missing English target and remove or resolve orphaned English files.',
+    '- Create a missing English target and remove or resolve orphaned English documents or skills.',
     '- Keep English files concise, direct, and free of untranslated Chinese text.',
     '- Preserve command names, paths, warnings, validation rules, and forbidden actions.',
     '- Preserve each file''s purpose and section structure where practical.',

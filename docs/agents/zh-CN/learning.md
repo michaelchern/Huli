@@ -20,6 +20,13 @@
 - Failed explorations
 - Validation
 
+## 活动规划与长期沉淀
+
+- `docs/tasks/zh-CN/` 保存可提交、可复用的主题状态、复现步骤和验证配方。
+- 默认不要创建平行状态目录。用户明确要求文件规划工作流时，可以使用被 Git 忽略的 `.planning/<plan-id>/task_plan.md`、`findings.md` 和 `progress.md` 保存本机活动状态。
+- 活动计划完成后，把仍有长期价值的事实、验证入口和失败经验整理到对应 `docs/tasks/zh-CN/*.md`；不要直接提交会话流水账。
+- 不要在仓库正式文档中硬编码某个用户的本地 skill 安装路径。
+
 ## 教学风格
 
 - 用户表示“没看懂”“符合直觉吗”“怎么被发明的”时，先讲动机和直觉，再进入 Vulkan API、数学或 shader 细节。

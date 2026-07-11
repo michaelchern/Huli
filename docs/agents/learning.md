@@ -1,5 +1,5 @@
 # Huli Learning Context
-<!-- AGENT_DOCS_LEARNING_ZH_CN_SHA256: 62a1e1291401d678d4ef8214c9f6b736840a8431d14725196935f1ffea39352c -->
+<!-- AGENT_DOCS_LEARNING_ZH_CN_SHA256: 1fda7b7d5115259c0a724519d6f2875571ffa909338dcd38b06cd3faf3122ab2 -->
 
 Load this file only for learning plans, chapter notes, reproduction experiments, concept explanation, or long-lived state distillation.
 
@@ -20,6 +20,13 @@ For each study topic, prefer the shape in `docs/tasks/zh-CN/study-template.md`:
 - Evidence
 - Failed explorations
 - Validation
+
+## Active Planning and Durable Knowledge
+
+- `docs/tasks/zh-CN/` holds commit-worthy, reusable topic state, reproduction steps, and validation recipes.
+- Do not create parallel state directories by default. When the user explicitly requests a file-planning workflow, Git-ignored `.planning/<plan-id>/task_plan.md`, `findings.md`, and `progress.md` may hold local active state.
+- After an active plan completes, distill facts, validation entrypoints, and failed approaches that remain useful into the matching `docs/tasks/zh-CN/*.md`; do not commit the raw session log.
+- Do not hardcode a user's local skill installation path in repository documentation.
 
 ## Teaching Style
 

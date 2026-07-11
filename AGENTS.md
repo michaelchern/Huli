@@ -1,5 +1,5 @@
 # Huli Agent Entry
-<!-- AGENTS_ZH_CN_SHA256: 207f8b71eb0e281156aa7c3e5cbd4f8dcfdb4086a747ba5f59b5860e5c098753 -->
+<!-- AGENTS_ZH_CN_SHA256: 660b3306860ed10cb268c22bd93e8a2747bd5cc3959424de80d80e2c0bbcc0ba -->
 
 > `AGENTS.zh-CN.md` is the Chinese source for the root AI entry.
 > Other Chinese sources live in `docs/agents/zh-CN/`, `docs/tasks/zh-CN/`, and `.agents/skills/*/SKILL.zh-CN.md`.
@@ -7,7 +7,7 @@
 
 ## 1. Core Rules
 
-Huli is a C++20 / Vulkan learning repository. It currently keeps only a minimal CMake skeleton, the AI workflow, and learning-record structure. Specific study sources, experiments, and build targets can be added later.
+Huli is a C++20 / Vulkan learning repository. Its root CMake project now integrates and builds Vulkan and graphics dependencies; Huli application targets and the Vulkan runtime entrypoint are not yet connected to the root build.
 
 When working in this repository:
 
@@ -15,7 +15,7 @@ When working in this repository:
 - Keep context narrow. Do not load Vulkan, build, and Git context all at once unless the task needs it.
 - Check `git status --short --branch` before editing.
 - Never revert user changes unless explicitly asked.
-- Do not assume that study material, source directories, build targets, or third-party dependencies have already been added.
+- Treat the live `CMakeLists.txt` and source tree as authoritative. Do not assume that study material, experiment targets, or runtime entrypoints have been connected to the root build.
 - Keep Huli learning artifacts in this repository. When using external material, state its source and learning purpose instead of copying large sections without explanation.
 - Report verification commands and results for every meaningful change. Docs-only changes normally need sync and diff checks only.
 
@@ -39,7 +39,7 @@ These skills are plain Markdown and vendor-neutral; they are not Codex-specific.
 
 ## 3. Key Paths
 
-- `CMakeLists.txt`: current minimal build skeleton; it does not yet define a project or buildable target.
+- `CMakeLists.txt`: root build entrypoint and live authority for dependency versions; it currently builds dependency targets but no Huli application target.
 - `docs/agents/`: on-demand AI context packs.
 - `docs/tasks/`: short task checklists, topic study state, reproduction steps, and validation recipes.
 - `.agents/skills/`: shared project agent skills.
@@ -54,7 +54,7 @@ After changing agent docs or skills, check sync:
 git diff --check
 ```
 
-For C++, CMake, shader, or example changes, run the smallest relevant validation. The root `CMakeLists.txt` is still a learning skeleton. If no buildable target is configured yet, say that clearly instead of treating the result as a Vulkan code failure.
+For C++, CMake, shader, or example changes, run the smallest relevant validation. The root project can validate dependencies, but that does not prove that a Huli application or Vulkan runtime path is connected. Report the exact validation scope.
 
 Docs-only changes usually do not require a CMake build.
 
@@ -78,7 +78,7 @@ Check whether all English agent files are synchronized with Chinese sources.
 
 - Only run `.\tools\sync-agents.ps1 -Check`.
 - Do not modify files.
-- Discover scope from the actual Chinese sources and check missing targets, orphaned English files, duplicate markers, and obvious untranslated Chinese body text.
+- Discover scope from the actual Chinese sources and check missing targets, orphaned English documents or skills, duplicate markers, and obvious untranslated Chinese body text.
 - If stale, tell the user to run `=sa`.
 
 ### `=ai`
@@ -87,10 +87,12 @@ Distill durable Huli learning context from this or recent AI conversations into 
 
 - Run `git status --short --branch` first, and do not overwrite or revert existing user changes.
 - First decide whether the material is worth preserving: it must reduce future misreads, shorten orientation, clarify forbidden actions, or lock in a validation entrypoint.
+- Search the owning document and related old statements before writing. Update or remove conflicting facts instead of appending a second version beside them.
 - Preserve only stable, reusable content: repository rules, directory responsibilities, learning workflow, validation workflows, common misreads, and recurring user preferences in this repo.
 - Do not preserve temporary guesses, one-off command output, unresolved debates, casual chat, secrets, or overly narrow implementation details.
 - Choose the target by ownership: root rules go in `AGENTS.zh-CN.md`; long-lived focused context goes in `docs/agents/zh-CN/*.md`; topic state, reproduction steps, or validation recipes go in `docs/tasks/zh-CN/*.md`; shared workflow, commands, intent-recognition rules, or cross-agent behavior go in `.agents/skills/huli-workflow/SKILL.zh-CN.md`.
-- Use the lightweight shape in `docs/tasks/zh-CN/study-template.md` for long-task recovery, evidence, TODO state, and failed explorations. Do not create a parallel state directory by default.
+- Treat live code and configuration as authoritative for discoverable dependency versions, targets, and paths; put one-off environments and validation results in task documents with dates, commands, and evidence.
+- By default, use `docs/tasks/zh-CN/study-template.md` for long-task recovery, evidence, TODO state, and failed explorations. Only when the user explicitly requests a file-planning workflow may local active state live in Git-ignored `.planning/<plan-id>/`; distill stable results back into `docs/tasks/zh-CN/` afterward.
 - Confirm the evidence before writing: explicit user preferences, current code facts, verified commands, reliable external sources, or settled designs. If evidence is weak, report candidates instead of turning them into rules.
 - After changing a Chinese source, sync the matching English file and update the SHA256 marker.
 - If nothing is certain or valuable enough to preserve, do not edit files; report candidates and why they were not preserved.

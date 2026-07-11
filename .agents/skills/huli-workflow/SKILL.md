@@ -2,7 +2,7 @@
 name: huli-workflow
 description: Vendor-neutral workflow for AI agents working in the Huli C++ Vulkan learning repository. Use when an agent edits this repo, handles =sa/=ca/=ai/=gc/=cm/=gh commands, or needs routing to build, GitHub, formatting, Vulkan, or learning context.
 ---
-<!-- HULI_WORKFLOW_SKILL_ZH_CN_SHA256: a99abef49ec80c5f594de0a25fd1dcd777a6e00154056ae621d1a67dba437f5b -->
+<!-- HULI_WORKFLOW_SKILL_ZH_CN_SHA256: de6e3eebf31653f9e6c53d99252493c8202e7543730190b23041d2a07b813bc2 -->
 
 # Huli Workflow
 
@@ -25,20 +25,22 @@ This skill is plain Markdown so Codex, Claude, Cursor, Gemini CLI, or other agen
 - `=cm`: commit intended changes to the current local branch only.
 - `=gh`: commit intended changes and publish them to a GitHub PR.
 
-For `=sa` and `=ca`, use `tools/sync-agents.ps1`. It discovers Chinese-source pairs dynamically and checks normalized SHA256 markers, missing targets, orphaned English files, and obvious untranslated body text.
+For `=sa` and `=ca`, use `tools/sync-agents.ps1`. It discovers Chinese-source pairs dynamically and checks normalized SHA256 markers, missing targets, orphaned English documents or skills, and obvious untranslated body text.
 
 For `=ai`:
 
 1. Inspect `git status --short --branch` first, and do not overwrite or revert existing user changes.
 2. Extract reusable intent from recent conversations: user trigger phrases, the correct entrypoint, forbidden actions, validation commands, and settled learning workflows.
-3. Decide whether the material is worth preserving: it must reduce future misreads, shorten orientation, improve implementation speed, or lower hallucination risk.
-4. Write to the right owner:
+3. Search the owning document and related old statements. If a new fact supersedes an old one, update or remove the old statement instead of keeping conflicting versions.
+4. Decide whether the material is worth preserving: it must reduce future misreads, shorten orientation, improve implementation speed, or lower hallucination risk.
+5. Write to the right owner:
    - Root repository rules: `AGENTS.zh-CN.md`.
    - Long-lived domain context: `docs/agents/zh-CN/*.md`.
    - Topic state, reproduction steps, and validation recipes: `docs/tasks/zh-CN/*.md`.
    - Shared workflow, commands, intent recognition, and cross-agent behavior: `.agents/skills/huli-workflow/SKILL.zh-CN.md`.
-5. Confirm evidence before writing: explicit user preferences, current code, reliable external sources, verified commands, or settled designs.
-6. After changing a Chinese source, sync the English AI-facing file and run `tools/sync-agents.ps1 -Check`.
+6. Treat dynamic facts discoverable from code or configuration as live-file data. Put one-off environments and validation results in dated task documents with evidence instead of copying them into long-lived context.
+7. Confirm evidence before writing: explicit user preferences, current code, reliable external sources, verified commands, or settled designs.
+8. After changing a Chinese source, sync the English AI-facing file and run `tools/sync-agents.ps1 -Check`.
 
 For `=gc`, `=cm`, and `=gh`, read `docs/agents/git.md` before acting.
 
@@ -63,7 +65,8 @@ If a context pack is missing, inspect source files directly and keep the answer 
 
 - Keep Huli routing thin: root `AGENTS` only holds entry rules, long-lived domain context lives in `docs/agents/zh-CN/`, short task checklists and topic state live in `docs/tasks/zh-CN/`, and skills carry only strongly triggered workflows and intent recognition.
 - Do not copy Horizon or other repository AI frameworks wholesale. Before borrowing, compare repository goal, language source, sync mechanism, context size, and drift risk.
-- When multi-turn or long-running tasks need recoverable state, use `docs/tasks/zh-CN/study-template.md`; do not create a parallel state directory by default.
+- For multi-turn or long-running work, use `docs/tasks/zh-CN/study-template.md` by default. When the user explicitly requests a file-planning workflow, Git-ignored `.planning/<plan-id>/` may hold local active state; distill only stable results into `docs/tasks/zh-CN/` afterward.
+- Do not write local optional-skill installation paths into project rules or commit raw session logs as long-lived knowledge.
 - Add a new skill only when there is a clear trigger phrase, repeated workflow, or frequent-misread risk; every skill must have an accurate frontmatter `description`.
 
 ## Non-Negotiables
