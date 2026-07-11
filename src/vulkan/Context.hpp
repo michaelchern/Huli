@@ -18,43 +18,46 @@
 #include "Utility.hpp"
 #include "vk_mem_alloc.h"
 
-namespace VulkanCore {
+namespace Vulkan 
+{
+    class Framebuffer;
+    class RenderPass;
+    class Sampler;
+    class Texture;
 
-class Framebuffer;
-class RenderPass;
-class Sampler;
-class Texture;
+    template <size_t CHAIN_SIZE = 10>
+    class VulkanFeatureChain 
+    {
+    public:
+        VulkanFeatureChain() = default;
+        MOVABLE_ONLY(VulkanFeatureChain);
 
-template <size_t CHAIN_SIZE = 10>
-class VulkanFeatureChain {
- public:
-  VulkanFeatureChain() = default;
-  MOVABLE_ONLY(VulkanFeatureChain);
+        auto& pushBack(auto nextVulkanChainStruct) 
+        {
+            ASSERT(currentIndex_ < CHAIN_SIZE, "Chain is full");
+            data_[currentIndex_] = nextVulkanChainStruct;
 
-  auto& pushBack(auto nextVulkanChainStruct) {
-    ASSERT(currentIndex_ < CHAIN_SIZE, "Chain is full");
-    data_[currentIndex_] = nextVulkanChainStruct;
+            auto& next = std::any_cast<decltype(nextVulkanChainStruct)&>(data_[currentIndex_]);
 
-    auto& next = std::any_cast<decltype(nextVulkanChainStruct)&>(data_[currentIndex_]);
+            next.pNext = std::exchange(firstNext_, &next);
+            currentIndex_++;
 
-    next.pNext = std::exchange(firstNext_, &next);
-    currentIndex_++;
+            return next;
+        }
 
-    return next;
-  }
+        [[nodiscard]] void* firstNextPtr() const { return firstNext_; };
 
-  [[nodiscard]] void* firstNextPtr() const { return firstNext_; };
+    private:
+        std::array<std::any, CHAIN_SIZE> data_;
+        VkBaseInStructure* root_ = nullptr;
+        int currentIndex_ = 0;
+        void* firstNext_ = VK_NULL_HANDLE;
+    };
 
- private:
-  std::array<std::any, CHAIN_SIZE> data_;
-  VkBaseInStructure* root_ = nullptr;
-  int currentIndex_ = 0;
-  void* firstNext_ = VK_NULL_HANDLE;
-};
-
-class Context final {
- public:
-  MOVABLE_ONLY(Context);
+    class Context final 
+    {
+    public:
+        MOVABLE_ONLY(Context);
 
   explicit Context(void* window, const std::vector<std::string>& requestedLayers,
                    const std::vector<std::string>& requestedInstanceExtensions,
