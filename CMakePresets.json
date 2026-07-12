@@ -1,0 +1,146 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Kitware/CMake/master/Help/manual/presets/schema.json",
+  "version": 8,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 28,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "installDir": "${sourceDir}/out/install/${presetName}",
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "BUILD_TESTING": "OFF",
+        "GLI_TEST_ENABLE": "OFF",
+        "IMGUI_EXAMPLES": "OFF",
+        "TRACY_ENABLE": "OFF",
+        "TRACY_CALLSTACK": "OFF"
+      }
+    },
+    {
+      "name": "ninja-msvc",
+      "displayName": "Ninja MSVC",
+      "description": "Windows x64 - Ninja Multi-Config + MSVC",
+      "inherits": "base",
+      "generator": "Ninja Multi-Config",
+      "binaryDir": "${sourceDir}/out/build/ninja-msvc",
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      },
+      "toolset": {
+        "value": "host=x64",
+        "strategy": "external"
+      },
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "cl",
+        "CMAKE_CXX_COMPILER": "cl"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      }
+    },
+    {
+      "name": "ninja-clang",
+      "displayName": "Ninja Clang",
+      "description": "Windows x64 - Ninja Multi-Config + LLVM Clang (GNU-style driver)",
+      "inherits": "base",
+      "generator": "Ninja Multi-Config",
+      "binaryDir": "${sourceDir}/out/build/ninja-clang",
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "clang",
+        "CMAKE_CXX_COMPILER": "clang++"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      }
+    },
+    {
+      "name": "ninja-msvc-asan",
+      "displayName": "Ninja MSVC AddressSanitizer",
+      "description": "Windows x64 - MSVC AddressSanitizer, built as RelWithDebInfo",
+      "inherits": "ninja-msvc",
+      "binaryDir": "${sourceDir}/out/build/ninja-msvc-asan",
+      "environment": {
+        "CFLAGS": "$penv{CFLAGS} /fsanitize=address",
+        "CXXFLAGS": "$penv{CXXFLAGS} /fsanitize=address"
+      }
+    },
+    {
+      "name": "ninja-msvc-tracy",
+      "displayName": "Ninja MSVC Tracy",
+      "description": "Windows x64 - MSVC release build with Tracy and call stacks enabled",
+      "inherits": "ninja-msvc",
+      "binaryDir": "${sourceDir}/out/build/ninja-msvc-tracy",
+      "cacheVariables": {
+        "TRACY_ENABLE": "ON",
+        "TRACY_CALLSTACK": "ON"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "msvc-debug",
+      "displayName": "MSVC Debug",
+      "configurePreset": "ninja-msvc",
+      "configuration": "Debug",
+      "verbose": true
+    },
+    {
+      "name": "msvc-release",
+      "displayName": "MSVC Release",
+      "configurePreset": "ninja-msvc",
+      "configuration": "Release",
+      "verbose": true
+    },
+    {
+      "name": "msvc-relwithdebinfo",
+      "displayName": "MSVC RelWithDebInfo",
+      "configurePreset": "ninja-msvc",
+      "configuration": "RelWithDebInfo",
+      "verbose": true
+    },
+    {
+      "name": "clang-debug",
+      "displayName": "Clang Debug",
+      "configurePreset": "ninja-clang",
+      "configuration": "Debug",
+      "verbose": true
+    },
+    {
+      "name": "clang-release",
+      "displayName": "Clang Release",
+      "configurePreset": "ninja-clang",
+      "configuration": "Release",
+      "verbose": true
+    },
+    {
+      "name": "clang-relwithdebinfo",
+      "displayName": "Clang RelWithDebInfo",
+      "configurePreset": "ninja-clang",
+      "configuration": "RelWithDebInfo",
+      "verbose": true
+    },
+    {
+      "name": "msvc-asan-relwithdebinfo",
+      "displayName": "MSVC AddressSanitizer RelWithDebInfo",
+      "configurePreset": "ninja-msvc-asan",
+      "configuration": "RelWithDebInfo",
+      "verbose": true
+    },
+    {
+      "name": "msvc-tracy-release",
+      "displayName": "MSVC Tracy Release",
+      "configurePreset": "ninja-msvc-tracy",
+      "configuration": "Release",
+      "verbose": true
+    }
+  ]
+}

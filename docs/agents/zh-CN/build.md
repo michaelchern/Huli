@@ -4,7 +4,7 @@
 
 ## 当前状态
 
-- Huli 使用 CMake 3.28+、C++20、Ninja、MSVC 和 Vulkan SDK。
+- Huli 使用 CMake 3.28+、C++20、Ninja Multi-Config、MSVC、Clang 和 Vulkan SDK。
 - 根 `CMakeLists.txt` 已声明 `project(Huli)`，会下载、配置并构建第三方依赖。
 - Vulkan SDK `1.4.350.0` 是当前验证和推荐基线，不代表根 CMake 会拒绝所有其他 SDK 版本。
 - 根文件末尾的 Huli 源码 `add_subdirectory(...)` 仍处于注释状态；当前构建验证依赖目标，不代表已经生成 Huli 应用、编译 `src/vulkan` 或完成 Vulkan 运行验证。
@@ -33,9 +33,12 @@ VULKAN_SDK=C:\VulkanSDK\1.4.350.0
 
 ## Visual Studio 配置
 
-- `CMakeSettings.json` 提供 Ninja/MSVC 的 Debug、AddressSanitizer、Release、RelWithDebInfo 和 Tracy 配置；它是 Visual Studio 入口，不替代命令行验证。
-- 首次验证优先使用 `x64-Debug`。如果该配置复用了旧 SDK 缓存，先 Delete Cache and Reconfigure。
-- 修改或新增配置后，至少检查 JSON 可解析、配置目录独立，并确认实际 `CMakeCache.txt` 使用了预期编译器和 Vulkan SDK。
+- `CMakePresets.json` 是 Visual Studio、命令行和未来 CI 共用的唯一项目配置入口；不要重新添加并行维护的 `CMakeSettings.json`。
+- Windows 核心 configure presets 是 `ninja-msvc` 和 `ninja-clang`，都使用 Ninja Multi-Config；专项 presets 是 `ninja-msvc-asan` 和 `ninja-msvc-tracy`。
+- MSVC 和 Clang 各提供 Debug、Release、RelWithDebInfo build preset；ASan 使用 MSVC RelWithDebInfo，Tracy 使用 MSVC Release。
+- `ninja-clang` 使用 `clang` / `clang++` GNU 风格驱动，不是 `clang-cl`。编译器只按命令名查找，不能把个人 LLVM 安装绝对路径写入项目 preset。
+- 本机路径、个人环境覆盖或实验配置写入已忽略的 `CMakeUserPresets.json`；`VULKAN_SDK` 继续由启动 Visual Studio 或终端的环境提供。
+- 修改或新增 preset 后，至少运行 `cmake --list-presets`、确认构建目录相互隔离，并检查实际 `CMakeCache.txt` 使用了预期生成器、编译器和 Vulkan SDK。
 
 ## 命令行配置与构建
 
@@ -44,20 +47,26 @@ VULKAN_SDK=C:\VulkanSDK\1.4.350.0
 ```powershell
 $env:VULKAN_SDK = "C:\VulkanSDK\1.4.350.0"
 
-cmake -S . -B out/build/dependency-check -G Ninja `
-  -DCMAKE_BUILD_TYPE=Debug `
-  -DBUILD_TESTING=OFF `
-  -DGLI_TEST_ENABLE=OFF `
-  -DTRACY_CALLSTACK=OFF `
-  -DTRACY_ENABLE=OFF `
-  -DIMGUI_EXAMPLES=OFF
-
-cmake --build out/build/dependency-check --parallel 8
+cmake --preset ninja-msvc
+cmake --build --preset msvc-debug --parallel 8
+cmake --build --preset msvc-debug --parallel 8
 ```
 
 配置必须出现 `Configuring done` 和 `Generating done`，完整构建必须以退出代码 `0` 结束。未修改输入时再次构建应显示 `ninja: no work to do.`。
 
-如果普通 PowerShell 找不到 MSVC 头文件或库，使用 Visual Studio Developer PowerShell，或先调用对应安装目录中的 `VsDevCmd.bat -arch=x64 -host_arch=x64`。
+Clang 配置使用 `cmake --preset ninja-clang` 和对应的 `clang-*` build preset。普通 PowerShell 找不到 MSVC 头文件、Windows SDK 或库时，使用 Visual Studio Developer PowerShell，或先调用对应安装目录中的 `VsDevCmd.bat -arch=x64 -host_arch=x64`；Clang 构建也应在该环境中运行，以稳定获得 Windows SDK。
+
+ASan 与 Tracy 使用独立构建树：
+
+```powershell
+cmake --preset ninja-msvc-asan
+cmake --build --preset msvc-asan-relwithdebinfo --parallel 8
+
+cmake --preset ninja-msvc-tracy
+cmake --build --preset msvc-tracy-release --parallel 8
+```
+
+ASan preset 通过 `CFLAGS` / `CXXFLAGS` 添加 `/fsanitize=address`，并使用 RelWithDebInfo 避免 MSVC Debug 默认 `/RTC1` 冲突。Tracy preset 将 `TRACY_ENABLE` 和 `TRACY_CALLSTACK` 设为 `ON`。当前根构建仍只覆盖第三方依赖；这些专项配置不能证明 Huli 应用已完成插桩或 Tracy 运行采集。
 
 ## 常见日志判断
 
