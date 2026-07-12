@@ -28,7 +28,7 @@ add_library(
   Texture.hpp
   Utility.cpp
   Utility.hpp
-  vma.cpp
+  Vma.cpp
 )
 add_library(Huli::Vulkan ALIAS huli_vulkan)
 
