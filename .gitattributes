@@ -29,6 +29,8 @@
 *.jpg binary
 *.pdf binary
 *.png binary
+*.tar binary
+*.tga binary
 *.webp binary
 *.zip binary
 
@@ -38,5 +40,15 @@
 *.ktx binary
 *.ktx2 binary
 *.spv binary
+
+# Common prebuilt binary payloads.
+*.a binary
+*.dll binary
+*.dylib binary
+*.exe binary
+*.lib binary
+*.pdb binary
+*.so binary
+*.so.* binary
 
 # Add Git LFS, export-ignore, or GitHub Linguist rules only when a project uses them.

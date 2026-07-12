@@ -1,46 +1,67 @@
-﻿################################################################################
-# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
-################################################################################
+# Build trees
+/[Bb]uild/
+/[Bb]uild-*/
+/[Oo]ut/
+/cmake-build-*/
 
-/.vs
-/out/build/x64-Debug/_deps
-/out/build/x64-Debug/VulkanBook.pdb
-/out/build/x64-Debug/VulkanBook.ilk
-/out/build/x64-Debug/VulkanBook.exe
-/out/build/x64-Debug/VSInheritEnvironments.txt
-/out/build/x64-Debug/Testing/Temporary
-/out/build/x64-Debug/include/glslang
-/out/build/x64-Debug/compile_commands.json
-/out/build/x64-Debug/cmake_install.cmake
-/out/build/x64-Debug/CMakeFiles
-/out/build/x64-Debug/CMakeCache.txt
-/out/build/x64-Debug/build.ninja
-/out/build/x64-Debug/.ninja_log
-/out/build/x64-Debug/.ninja_deps
-/out/build/x64-Debug/.cmake/api/v1
-/out/build/x64-Debug
+# Local tool caches
+/.cache/
+
+# CMake user-local and generated state
+/CMakeUserPresets.json
+/CMakeLists.txt.user
+/CMakeCache.txt
+/CMakeFiles/
+/CTestTestfile.cmake
+/Testing/
+/_deps/
+/.cmake/api/v1/
+/cmake_install.cmake
+/install_manifest.txt
+/compile_commands.json
+/build.ninja
+/.ninja_deps
+/.ninja_log
+
+# Visual Studio local state
+/.vs/
 /CppProperties.json
-/txt/chapter1/art/.$objectDependency.drawio.bkp
-/txt/chapter1/art/.$applicationDiagram.drawio.dtmp
-/txt/chapter1/art/.$applicationDiagram.drawio.bkp
-/txt/index.html
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.aps
+*.cachefile
+*.ipch
+*.ncb
+*.opendb
+*.opensdf
+*.sdf
+*.VC.db
+*.VC.VC.opendb
+ipch/
+
+# Temporary and backup files
+*~
+*.bak
 *.bkp
 *.dtmp
-/out
-/txt/index.xml
-/_deps
-build.ninja
-cmake_install.cmake
-/txt/~$index.docx
-source/out/source/openxr/app/.cxx
-source/openxr/out
-source/openxr/a_out
-source/chapter8/a_out
-source/openxr
-source/chapter8/.idea
-/source/chapter4/resources/shaders/indirectdraw.vert
-/source/chapter4/resources/shaders/indirectdraw.frag
-/source/chapter4/resources/shaders/IndirectCommon.glsl
-/source/chapter4/resources/shaders/CommonStructs.glsl
-/source/chapter4/resources/shaders/BufferDeviceAddress.glsl
+*.swp
+*.swo
+*.tmp
+~$*
+
+# Operating-system metadata
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Desktop.ini
+ehthumbs.db
+Thumbs.db
+
+# Huli-local planning state; remove this section when a copied project does not use it.
 /.planning/
+
+# Add package-manager, coverage, generated-asset, or other IDE rules only when a project uses them.

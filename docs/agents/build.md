@@ -1,5 +1,5 @@
 # Huli Build Context
-<!-- AGENT_DOCS_BUILD_ZH_CN_SHA256: 73d8f29993efbf0bd2f45f60599e43c2b778e2e971184e16faff45d96aefaed4 -->
+<!-- AGENT_DOCS_BUILD_ZH_CN_SHA256: 573f2acc7c2c78d2cf88eea894f6412cc5489f4006419bf030d4b691ccd9fbac -->
 
 Load this file only for CMake, build, Visual Studio, validation-command, or compiler-error work.
 
@@ -71,6 +71,8 @@ If plain PowerShell cannot find MSVC headers or libraries, use Visual Studio Dev
 ## Change and Validation Rules
 
 - Run `git status --short --branch` before edits and preserve user changes.
+- Organize `.gitignore` around generated directories and tool-local state. Do not globally ignore source files, shaders, or potentially intentional prebuilt files such as `.exe`, `.dll`, and `.lib`. `CMakePresets.json` may be version-controlled; `CMakeUserPresets.json` must stay ignored.
+- After changing `.gitignore`, use `git check-ignore -v --no-index` to test representative paths that should and should not be ignored. Do not substitute cleanup commands for rule validation.
 - After CMake, dependency-version, or build-option changes, run a fresh configure, complete build, and `git diff --check`.
 - Docs-only changes do not require a rebuild, but must pass `tools/sync-agents.ps1 -Check` and `git diff --check`.
 - Put one-off tool versions, build directories, and validation results in dated `docs/tasks/` documents rather than promoting them to timeless domain rules.

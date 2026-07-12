@@ -70,6 +70,8 @@ cmake --build out/build/dependency-check --parallel 8
 ## 修改与验证规则
 
 - 修改前运行 `git status --short --branch`，不要覆盖用户已有改动。
+- `.gitignore` 按生成目录和工具本地状态组织；不要全局忽略源码、shader 或 `.exe` / `.dll` / `.lib` 等可能合法提交的预编译文件。`CMakePresets.json` 可以进入版本库，`CMakeUserPresets.json` 必须保持忽略。
+- 修改 `.gitignore` 后，用 `git check-ignore -v --no-index` 同时验证应忽略与不应忽略的代表路径，不要用清理命令代替规则检查。
 - CMake、依赖版本或构建选项改动后，运行全新目录配置、完整构建和 `git diff --check`。
 - 纯文档改动不要求重新编译，但必须运行 `tools/sync-agents.ps1 -Check` 和 `git diff --check`。
 - 一次性工具版本、构建目录和验证结果写入带日期与命令的 `docs/tasks/` 文档，不要升级为无时间边界的长期规则。
