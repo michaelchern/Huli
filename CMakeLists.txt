@@ -7,11 +7,13 @@ project("Huli" VERSION 0.1 LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+#[[ 暂未接入 NRD；保留配置，等光线追踪路径需要 NRD 时恢复。
 if (MSVC)
     # ShaderMake 对 NRD 要求的最低 Windows SDK 版本
     # 光线追踪项目需要使用 NRD
     set(_MIN_WINDOWS_SDK_VERSION_BUILD 20348)
 endif()
+]]
 
 # 第三方依赖与 Vulkan SDK 集成。
 find_package(Vulkan REQUIRED COMPONENTS SPIRV-Tools)
@@ -79,6 +81,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(glm)
 
+#[[ 当前 Vulkan 源码尚未使用 GLI；保留配置供纹理容器加载功能恢复。
 # GLI：提供仅头文件的图像和 GPU 纹理容器加载工具。
 set(GLI_TEST_ENABLE OFF CACHE INTERNAL "")
 FetchContent_Declare(
@@ -89,7 +92,9 @@ FetchContent_Declare(
   SOURCE_SUBDIR _huli_skip_cmake
 )
 FetchContent_MakeAvailable(gli)
+]]
 
+#[[ 当前 Vulkan 源码直接通过平台 API 创建 Surface，尚未使用 ImGui 或 GLFW。
 if (NOT ANDROID)
   # Dear ImGui：为工具界面和调试界面提供立即模式 UI 控件。
   FetchContent_Declare(
@@ -125,7 +130,9 @@ if (NOT ANDROID)
   )
   FetchContent_MakeAvailable(glfw)
 endif()
+]]
 
+#[[ 当前 Vulkan 源码尚未使用 stb；保留配置供图像和字体加载功能恢复。
 # stb：提供图像读取、图像写入、字体处理等单头文件工具。
 # 上游没有正式发布标签，因此固定到已核对的不可变提交。
 FetchContent_Declare(
@@ -135,6 +142,7 @@ FetchContent_Declare(
   SOURCE_SUBDIR _huli_skip_cmake
 )
 FetchContent_MakeAvailable(stb)
+]]
 
 # Tracy：低开销 CPU/GPU 性能分析器，用于检查帧耗时和代码区间。
 FetchContent_Declare(
@@ -146,6 +154,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(tracy)
 
+#[[ 当前 Vulkan 源码尚未使用 BS::thread_pool；保留配置供 CPU 任务并发功能恢复。
 # BS::thread_pool：仅头文件的工作线程池，用于并发分发 CPU 任务。
 FetchContent_Declare(
   threadpool
@@ -155,7 +164,9 @@ FetchContent_Declare(
   SOURCE_SUBDIR _huli_skip_cmake
 )
 FetchContent_MakeAvailable(threadpool)
+]]
 
+#[[ 当前 Vulkan 源码尚未包含文字渲染路径；FreeType 和 font-demo 一并保留待用。
 # FreeType：把字体轮廓光栅化为文字渲染所需的字形位图。
 set(FT_DISABLE_ZLIB ON CACHE BOOL "关闭 FreeType 的 zlib 支持" FORCE)
 set(FT_DISABLE_BZIP2 ON CACHE BOOL "关闭 FreeType 的 bzip2 支持" FORCE)
@@ -182,7 +193,9 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(font-demo)
 add_library(font-load-glyp "${font-demo_SOURCE_DIR}/geometry.c" "${font-demo_SOURCE_DIR}/outline.c")
 add_definitions(-DFONT_DEMO_SOURCE_DIR="${font-demo_SOURCE_DIR}")
+]]
 
+#[[ 当前 Vulkan 源码尚未包含 glTF 资源加载路径；相关依赖和占位目标一并保留待用。
 # RapidJSON：Microsoft glTF SDK 使用的仅头文件 JSON 解析器。
 # 在这里提供接口目标，可以阻止 glTF-SDK 启动已不兼容 CMake 4.x 的旧式嵌套下载器。
 # 此精确提交由 glTF-SDK 1.9.6 指定，并包含它需要的 SchemaDocument 接口；
@@ -218,7 +231,9 @@ FetchContent_Declare(
   GIT_SHALLOW TRUE
 )
 FetchContent_MakeAvailable(gltfsdk)
+]]
 
+#[[ 当前 Vulkan 源码尚未使用 meshoptimizer；保留配置供网格处理功能恢复。
 # meshoptimizer：优化网格索引、顶点读取、过度绘制和网格压缩。
 FetchContent_Declare(
   meshopt
@@ -227,7 +242,9 @@ FetchContent_Declare(
   GIT_SHALLOW TRUE
 )
 FetchContent_MakeAvailable(meshopt)
+]]
 
+#[[ 当前 Vulkan 源码尚未接入 DLSS；保留配置供超分辨率功能恢复。
 # NVIDIA DLSS：提供 AI 辅助超分辨率所需的头文件和可再分发二进制文件。
 FetchContent_Declare(
   dlss
@@ -239,25 +256,35 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(dlss)
 set(DLSS_DLL "${dlss_SOURCE_DIR}/lib/Windows_x86_64/rel/nvngx_dlss.dll")
 link_directories(${dlss_SOURCE_DIR}/lib/Windows_x86_64/x86_64/)
+]]
 
+#[[ 以下目录对应当前已注释的依赖，恢复依赖时再一并恢复。
 include_directories(${stb_SOURCE_DIR})
+]]
 include_directories(${volk_SOURCE_DIR})
 include_directories(${glm_SOURCE_DIR})
+#[[
 include_directories(${gli_SOURCE_DIR})
 include_directories(${spirvcross_SOURCE_DIR})
+]]
 include_directories(${spirvreflect_SOURCE_DIR})
+#[[
 include_directories(${gltfsdk_SOURCE_DIR}/GLTFSDK/Inc)
 if (NOT ANDROID)
   include_directories(${glfw_SOURCE_DIR}/include)
   include_directories(${imgui_SOURCE_DIR})
 endif()
+]]
 include_directories(${tracy_SOURCE_DIR}/public)
+#[[
 include_directories(${threadpool_SOURCE_DIR}/include)
 include_directories(${meshopt_SOURCE_DIR}/src)
 include_directories(${freetype_SOURCE_DIR}/include)
 include_directories(${font-demo_SOURCE_DIR})
 include_directories(${dlss_SOURCE_DIR}/include)
+]]
 
+#[[ 当前没有目标使用 RequiredVulkanSDKLIBS，且其中的 SPIRV-Cross 尚未声明获取来源。
 set(RequiredVulkanSDKLIBS 
     debug OSDependentd optimized OSDependent
     debug MachineIndependentd optimized MachineIndependent
@@ -284,6 +311,7 @@ if (GLSLANG_LIB)
       debug spirv-cross-glsld optimized spirv-cross-glsl
       debug spirv-cross-reflectd optimized spirv-cross-reflect)
 endif()
+]]
 
 #add_subdirectory(source/vulkancore)
 #add_subdirectory(source/enginecore)
