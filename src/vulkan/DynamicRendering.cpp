@@ -1,6 +1,6 @@
 #include "DynamicRendering.hpp"
 
-namespace VulkanCore {
+namespace Huli::Vulkan {
 
 std::string DynamicRendering::instanceExtensions() {
   return "VK_KHR_get_physical_device_properties2";
@@ -132,4 +132,4 @@ void DynamicRendering::endRenderingCmd(VkCommandBuffer commandBuffer, VkImage im
   }
 }
 
-}  // namespace VulkanCore
+}  // namespace Huli::Vulkan

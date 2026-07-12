@@ -6,7 +6,7 @@
 #include "Utility.hpp"
 #include "vk_mem_alloc.h"
 
-namespace VulkanCore {
+namespace Huli::Vulkan {
 
 class Buffer;
 class Context;
@@ -109,4 +109,4 @@ class Texture final {
   std::string debugName_;
 };
 
-}  // namespace VulkanCore
+}  // namespace Huli::Vulkan

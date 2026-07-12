@@ -4,7 +4,8 @@
 #include <cstring>
 #include <fstream>
 
-namespace util {
+namespace Huli::Vulkan::Util
+{
 
 // https://stackoverflow.com/questions/11413860/best-string-hashing-function-for-short-filenames
 uint32_t fnv_hash(const void* key, int len) {
@@ -71,4 +72,4 @@ std::unordered_set<std::string> filterExtensions(
   return std::unordered_set<std::string>(result.begin(), result.end());
 }
 
-}  // namespace util
+}  // namespace Huli::Vulkan::Util

@@ -10,7 +10,7 @@
 #include "PhysicalDevice.hpp"
 #include "Texture.hpp"
 
-namespace VulkanCore {
+namespace Huli::Vulkan {
 
 Swapchain::Swapchain(const Context& context, const PhysicalDevice& physicalDevice,
                      VkSurfaceKHR surface, VkQueue presentQueue, VkFormat imageFormat,
@@ -147,4 +147,4 @@ void Swapchain::createSemaphores(const Context& context) {
                           "Semaphore: swapchain image presented semaphore");
 }
 
-}  // namespace VulkanCore
+}  // namespace Huli::Vulkan

@@ -5,7 +5,7 @@
 #include "Common.hpp"
 #include "Utility.hpp"
 
-namespace VulkanCore {
+namespace Huli::Vulkan {
 
 class Context;
 
@@ -32,4 +32,4 @@ class Sampler final {
   VkSampler sampler_ = VK_NULL_HANDLE;
 };
 
-}  // namespace VulkanCore
+}  // namespace Huli::Vulkan

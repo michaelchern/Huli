@@ -5,7 +5,7 @@
 #include "Context.hpp"
 #include "Texture.hpp"
 
-namespace VulkanCore {
+namespace Huli::Vulkan {
 
 RenderPass::RenderPass(const Context& context,
                        const std::vector<std::shared_ptr<Texture>> attachments,
@@ -389,4 +389,4 @@ RenderPass::~RenderPass() { vkDestroyRenderPass(device_, renderPass_, nullptr); 
 
 VkRenderPass RenderPass::vkRenderPass() const { return renderPass_; }
 
-}  // namespace VulkanCore
+}  // namespace Huli::Vulkan

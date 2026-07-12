@@ -18,7 +18,7 @@
   CLASS_NAME(CLASS_NAME&&) noexcept = default;       \
   CLASS_NAME& operator=(CLASS_NAME&&) noexcept = default;
 
-namespace util 
+namespace Huli::Vulkan::Util
 {
     // https://stackoverflow.com/questions/11413860/best-string-hashing-function-for-short-filenames
     uint32_t fnv_hash(const void* key, int len);
@@ -40,4 +40,4 @@ namespace util
         (hash_combine(seed, rest), ...);
     }
 
-}  // namespace util
+}  // namespace Huli::Vulkan::Util

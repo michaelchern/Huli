@@ -4,7 +4,7 @@
 
 #define VOLK_IMPLEMENTATION
 
-namespace VulkanCore {
+namespace Huli::Vulkan {
 
 VkImageViewType imageTypeToImageViewType(VkImageType imageType, VkImageCreateFlags flags,
                                          bool multiview) {
@@ -413,4 +413,4 @@ uint32_t bytesPerPixel(VkFormat format) {
   return result;
 }
 
-}  // namespace VulkanCore
+}  // namespace Huli::Vulkan

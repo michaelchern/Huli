@@ -10,7 +10,7 @@
 #include "Common.hpp"
 #include "Utility.hpp"
 
-namespace VulkanCore {
+namespace Huli::Vulkan {
 
 class Context;
 
@@ -58,4 +58,4 @@ class ShaderModule final {
   std::string entryPoint_;
 };
 
-}  // namespace VulkanCore
+}  // namespace Huli::Vulkan

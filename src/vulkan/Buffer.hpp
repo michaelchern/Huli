@@ -12,7 +12,7 @@
 /// @file Buffer.hpp
 /// @brief 声明 Vulkan 缓冲区及其 VMA 内存分配的 RAII 封装。
 
-namespace Vulkan
+namespace Huli::Vulkan
 {
     class Context;
     class Texture;
@@ -168,4 +168,4 @@ namespace Vulkan
         std::unordered_map<VkFormat, VkBufferView> bufferViews_;
     };
 
-}  // namespace Vulkan
+}  // namespace Huli::Vulkan

@@ -3,7 +3,7 @@
 #include "Utility.hpp"
 #include "vk_mem_alloc.h"
 
-namespace VulkanCore {
+namespace Huli::Vulkan {
 
 class DynamicRendering final {
  public:
@@ -34,4 +34,4 @@ class DynamicRendering final {
       VkImageLayout newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
 };
 
-}  // namespace VulkanCore
+}  // namespace Huli::Vulkan

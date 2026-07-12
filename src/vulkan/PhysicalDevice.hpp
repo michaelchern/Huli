@@ -9,7 +9,7 @@
 #include "Common.hpp"
 #include "Utility.hpp"
 
-namespace VulkanCore {
+namespace Huli::Vulkan {
 
 class PhysicalDevice final {
  public:
@@ -196,6 +196,6 @@ class PhysicalDevice final {
   VkSurfaceCapabilitiesKHR surfaceCapabilities_;
   std::vector<VkPresentModeKHR> presentModes_;
   std::unordered_set<std::string> enabledExtensions_;
-};  // namespace VulkanCore
+};
 
-}  // namespace VulkanCore
+}  // namespace Huli::Vulkan

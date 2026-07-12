@@ -5,7 +5,7 @@
 #include "Context.hpp"
 #include "Texture.hpp"
 
-namespace VulkanCore {
+namespace Huli::Vulkan {
 
 Framebuffer::Framebuffer(const Context& context, VkDevice device, VkRenderPass renderPass,
                          const std::vector<std::shared_ptr<Texture>>& attachments,
@@ -51,4 +51,4 @@ Framebuffer::~Framebuffer() { vkDestroyFramebuffer(device_, framebuffer_, nullpt
 
 VkFramebuffer Framebuffer::vkFramebuffer() const { return framebuffer_; }
 
-}  // namespace VulkanCore
+}  // namespace Huli::Vulkan

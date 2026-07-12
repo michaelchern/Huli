@@ -6,7 +6,7 @@
 #include "Context.hpp"
 #include "Texture.hpp"
 
-namespace Vulkan
+namespace Huli::Vulkan
 {
     Buffer::Buffer(const Context* context,
                    VmaAllocator vmaAllocator,
@@ -154,4 +154,4 @@ namespace Vulkan
         return bufferView;
     }
 
-}  // namespace Vulkan
+}  // namespace Huli::Vulkan

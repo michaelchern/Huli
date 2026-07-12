@@ -7,7 +7,7 @@
 #include "Common.hpp"
 #include "Utility.hpp"
 
-namespace VulkanCore {
+namespace Huli::Vulkan {
 
 class Context;
 class Texture;
@@ -59,4 +59,4 @@ class RenderPass final {
   VkRenderPass renderPass_ = VK_NULL_HANDLE;
 };
 
-}  // namespace VulkanCore
+}  // namespace Huli::Vulkan

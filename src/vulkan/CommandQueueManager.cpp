@@ -6,7 +6,7 @@
 
 #include "Context.hpp"
 
-namespace VulkanCore {
+namespace Huli::Vulkan {
 
 CommandQueueManager::CommandQueueManager(const Context& context, VkDevice device,
                                          uint32_t count, uint32_t concurrentNumCommands,
@@ -168,4 +168,4 @@ void CommandQueueManager::deallocateResources() {
     }
   }
 }
-}  // namespace VulkanCore
+}  // namespace Huli::Vulkan

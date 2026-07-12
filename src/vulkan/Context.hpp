@@ -18,8 +18,7 @@
 #include "Utility.hpp"
 #include "vk_mem_alloc.h"
 
-namespace Vulkan 
-{
+namespace Huli::Vulkan {
     class Framebuffer;
     class RenderPass;
     class Sampler;
@@ -134,8 +133,8 @@ namespace Vulkan
                                               Buffer* actualBuffer,
                                               const std::string& name = "") const;
 
-  void uploadToGPUBuffer(VulkanCore::CommandQueueManager& queueMgr,
-                         VkCommandBuffer commandBuffer, VulkanCore::Buffer* gpuBuffer,
+  void uploadToGPUBuffer(CommandQueueManager& queueMgr, VkCommandBuffer commandBuffer,
+                         Buffer* gpuBuffer,
                          const void* data, long totalSize,
                          uint64_t gpuBufferOffset = 0) const;
 
@@ -301,4 +300,4 @@ namespace Vulkan
 #endif
 };
 
-}  // namespace VulkanCore
+}  // namespace Huli::Vulkan

@@ -2,7 +2,7 @@
 
 #include "Context.hpp"
 
-namespace VulkanCore {
+namespace Huli::Vulkan {
 Sampler::Sampler(const Context& context, VkFilter minFilter, VkFilter magFilter,
                  VkSamplerAddressMode addressModeU, VkSamplerAddressMode addressModeV,
                  VkSamplerAddressMode addressModeW, float maxLod, const std::string& name)
@@ -50,4 +50,4 @@ Sampler::Sampler(const Context& context, VkFilter minFilter, VkFilter magFilter,
   context.setVkObjectname(sampler_, VK_OBJECT_TYPE_SAMPLER, "Sampler: " + name);
 }
 
-}  // namespace VulkanCore
+}  // namespace Huli::Vulkan

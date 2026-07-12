@@ -6,7 +6,7 @@
 #include "Common.hpp"
 #include "Utility.hpp"
 
-namespace VulkanCore {
+namespace Huli::Vulkan {
 
 class Context;
 class Texture;
@@ -30,4 +30,4 @@ class Framebuffer final {
   VkFramebuffer framebuffer_ = VK_NULL_HANDLE;
 };
 
-}  // namespace VulkanCore
+}  // namespace Huli::Vulkan

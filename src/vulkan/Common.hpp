@@ -58,7 +58,7 @@
 #define LOGD(format, ...) LOGE(format, __VA_ARGS__)
 #endif
 
-namespace VulkanCore {
+namespace Huli::Vulkan {
 
 constexpr glm::vec4 RENDER_COLOR{1.f, 0.f, 0.f, 1.0f};
 
@@ -67,4 +67,4 @@ VkImageViewType imageTypeToImageViewType(VkImageType imageType, VkImageCreateFla
 
 uint32_t bytesPerPixel(VkFormat format);
 
-}  // namespace VulkanCore
+}  // namespace Huli::Vulkan

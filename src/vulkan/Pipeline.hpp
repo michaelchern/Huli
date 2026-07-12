@@ -9,7 +9,7 @@
 #include "Common.hpp"
 #include "Utility.hpp"
 
-namespace VulkanCore {
+namespace Huli::Vulkan {
 
 class Context;
 class Buffer;
@@ -163,9 +163,9 @@ class Pipeline final {
   struct SetBindings {
     uint32_t set_ = 0;
     uint32_t binding_ = 0;
-    std::span<std::shared_ptr<VulkanCore::Texture>> textures_;
-    std::span<std::shared_ptr<VulkanCore::Sampler>> samplers_;
-    std::shared_ptr<VulkanCore::Buffer> buffer;
+    std::span<std::shared_ptr<Texture>> textures_;
+    std::span<std::shared_ptr<Sampler>> samplers_;
+    std::shared_ptr<Buffer> buffer;
     uint32_t index_ = 0;
     uint32_t offset_ = 0;
     VkDeviceSize bufferBytes = 0;
@@ -252,4 +252,4 @@ class Pipeline final {
   std::mutex mutex_;
 };
 
-}  // namespace VulkanCore
+}  // namespace Huli::Vulkan

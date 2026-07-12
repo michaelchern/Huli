@@ -7,7 +7,7 @@
 #include "Buffer.hpp"
 #include "Context.hpp"
 
-namespace VulkanCore {
+namespace Huli::Vulkan {
 
 Texture::Texture(const Context& context, VkImageType type, VkFormat format,
                  VkImageCreateFlags flags, VkImageUsageFlags usageFlags,
@@ -76,7 +76,7 @@ Texture::Texture(const Context& context, VkImageType type, VkFormat format,
   context.setVkObjectname(image_, VK_OBJECT_TYPE_IMAGE, "Image: " + name);
 
   const VkImageViewType imageViewType =
-      VulkanCore::imageTypeToImageViewType(type, flags, multiview_);
+      imageTypeToImageViewType(type, flags, multiview_);
 
   viewType_ = imageViewType;
 
@@ -123,7 +123,7 @@ VkImageView Texture::vkImageView(uint32_t mipLevel) {
 
   if (!imageViewFramebuffers_.contains(mipLevel)) {
     const VkImageViewType imageViewType =
-        VulkanCore::imageTypeToImageViewType(type_, flags_, multiview_);
+        imageTypeToImageViewType(type_, flags_, multiview_);
 
     imageViewFramebuffers_[mipLevel] =
         createImageView(context_, imageViewType, format_, 1, VK_REMAINING_ARRAY_LAYERS,
@@ -603,4 +603,4 @@ VkImageView Texture::createImageView(const Context& context, VkImageViewType vie
   return imageView;
 }
 
-}  // namespace VulkanCore
+}  // namespace Huli::Vulkan

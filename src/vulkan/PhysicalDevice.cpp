@@ -4,7 +4,7 @@
 #include <iostream>
 #include <set>
 
-namespace VulkanCore {
+namespace Huli::Vulkan {
 
 PhysicalDevice::PhysicalDevice(VkPhysicalDevice device, VkSurfaceKHR surface,
                                const std::vector<std::string>& requestedExtensions,
@@ -46,7 +46,7 @@ PhysicalDevice::PhysicalDevice(VkPhysicalDevice device, VkSurfaceKHR surface,
                      return std::string(property.extensionName);
                    });
 
-    enabledExtensions_ = util::filterExtensions(extensions_, requestedExtensions);
+    enabledExtensions_ = Util::filterExtensions(extensions_, requestedExtensions);
   }
 
   if (surface != VK_NULL_HANDLE) {
@@ -233,4 +233,4 @@ void PhysicalDevice::enumeratePresentationModes(VkSurfaceKHR surface) {
   vkGetPhysicalDeviceSurfacePresentModesKHR(physicalDevice_, surface, &presentModeCount,
                                             presentModes_.data());
 }
-}  // namespace VulkanCore
+}  // namespace Huli::Vulkan

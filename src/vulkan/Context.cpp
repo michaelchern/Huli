@@ -41,7 +41,7 @@ VkBool32 VKAPI_PTR debugMessengerCallback(
 #endif
 }  // namespace
 
-namespace VulkanCore {
+namespace Huli::Vulkan {
 
 VkPhysicalDeviceFeatures Context::physicalDeviceFeatures_ = {
     .independentBlend = VK_TRUE,
@@ -97,9 +97,9 @@ Context::Context(void* window, const std::vector<std::string>& requestedLayers,
     : printEnumerations_{printEnumerations} {
   VK_CHECK(volkInitialize());
 
-  enabledLayers_ = util::filterExtensions(enumerateInstanceLayers(), requestedLayers);
+  enabledLayers_ = Util::filterExtensions(enumerateInstanceLayers(), requestedLayers);
   enabledInstanceExtensions_ =
-      util::filterExtensions(enumerateInstanceExtensions(), requestedInstanceExtensions);
+      Util::filterExtensions(enumerateInstanceExtensions(), requestedInstanceExtensions);
 
   // Transform list of enabled Instance layers from std::string to const char*
   std::vector<const char*> instanceLayers(enabledLayers_.size());
@@ -361,7 +361,7 @@ Context::Context(void* window, const std::vector<std::string>& requestedLayers,
 
   // Naming objects created before we had a device
   setVkObjectname(surface_, VK_OBJECT_TYPE_SURFACE_KHR, "Surface: " + name);
-}  // namespace VulkanCore
+}
 
 Context::Context(const VkApplicationInfo& appInfo,
                  const std::vector<std::string>& requestedLayers,
@@ -370,9 +370,9 @@ Context::Context(const VkApplicationInfo& appInfo,
     : applicationInfo_{appInfo}, printEnumerations_{printEnumerations} {
   VK_CHECK(volkInitialize());
 
-  enabledLayers_ = util::filterExtensions(enumerateInstanceLayers(), requestedLayers);
+  enabledLayers_ = Util::filterExtensions(enumerateInstanceLayers(), requestedLayers);
   enabledInstanceExtensions_ =
-      util::filterExtensions(enumerateInstanceExtensions(), requestedInstanceExtensions);
+      Util::filterExtensions(enumerateInstanceExtensions(), requestedInstanceExtensions);
 
   // Transform list of enabled Instance layers from std::string to const char*
   std::vector<const char*> instanceLayers(enabledLayers_.size());
@@ -765,9 +765,9 @@ std::shared_ptr<Buffer> Context::createStagingBuffer(VkDeviceSize size,
 }
 
 // creates staging buffer & upload data to gpubuffer
-void Context::uploadToGPUBuffer(VulkanCore::CommandQueueManager& queueMgr,
+void Context::uploadToGPUBuffer(CommandQueueManager& queueMgr,
                                 VkCommandBuffer commandBuffer,
-                                VulkanCore::Buffer* gpuBuffer, const void* data,
+                                Buffer* gpuBuffer, const void* data,
                                 long totalSize, uint64_t gpuBufferOffset) const {
   auto stagingBuffer = createStagingBuffer(totalSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
                                            gpuBuffer, "staging buffer");
@@ -797,7 +797,7 @@ std::shared_ptr<Sampler> Context::createSampler(VkFilter minFilter, VkFilter mag
                                    addressModeV, addressModeW, maxLod, name);
 }
 
-std::shared_ptr<VulkanCore::Sampler> Context::createSampler(
+std::shared_ptr<Sampler> Context::createSampler(
     VkFilter minFilter, VkFilter magFilter, VkSamplerAddressMode addressModeU,
     VkSamplerAddressMode addressModeV, VkSamplerAddressMode addressModeW, float maxLod,
     bool compareEnable, VkCompareOp compareOp, const std::string& name /*= ""*/) const {
@@ -821,7 +821,7 @@ CommandQueueManager Context::createGraphicsCommandQueue(uint32_t count,
       VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT, name);
 }
 
-VulkanCore::CommandQueueManager Context::createTransferCommandQueue(
+CommandQueueManager Context::createTransferCommandQueue(
     uint32_t count, uint32_t concurrentNumCommands, const std::string& name,
     int transferQueueIndex) {
   if (transferQueueIndex != -1) {
@@ -861,12 +861,12 @@ std::shared_ptr<Pipeline> Context::createGraphicsPipeline(
   return std::make_shared<Pipeline>(this, desc, renderPass, name);
 }
 
-std::shared_ptr<VulkanCore::Pipeline> Context::createComputePipeline(
+std::shared_ptr<Pipeline> Context::createComputePipeline(
     const Pipeline::ComputePipelineDescriptor& desc, const std::string& name /*= ""*/) {
   return std::make_shared<Pipeline>(this, desc, name);
 }
 
-std::shared_ptr<VulkanCore::Pipeline> Context::createRayTracingPipeline(
+std::shared_ptr<Pipeline> Context::createRayTracingPipeline(
     const Pipeline::RayTracingPipelineDescriptor& desc,
     const std::string& name /*= ""*/) {
   return std::make_shared<Pipeline>(this, desc, name);
@@ -1050,4 +1050,4 @@ PhysicalDevice Context::choosePhysicalDevice(
   return devices[0];
 }
 
-}  // namespace VulkanCore
+}  // namespace Huli::Vulkan

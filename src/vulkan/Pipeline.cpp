@@ -6,7 +6,7 @@
 #include "Sampler.hpp"
 #include "Texture.hpp"
 
-namespace VulkanCore {
+namespace Huli::Vulkan {
 
 static constexpr int MAX_DESCRIPTOR_SETS = 4096 * 3;
 
@@ -676,7 +676,7 @@ void Pipeline::createGraphicsPipeline() {
 
   context_->setVkObjectname(vkPipeline_, VK_OBJECT_TYPE_PIPELINE,
                             "Graphics pipeline: " + name_);
-}  // namespace VulkanCore
+}
 
 void Pipeline::createComputePipeline() {
   const auto computeShader = computePipelineDesc_.computeShader_.lock();
@@ -930,4 +930,4 @@ void Pipeline::initDescriptorLayout() {
   }
 }
 
-}  // namespace VulkanCore
+}  // namespace Huli::Vulkan

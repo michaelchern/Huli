@@ -63,7 +63,7 @@ class CustomIncluder final : public glslang::TShader::Includer {
 }  // namespace
 #endif
 
-namespace VulkanCore {
+namespace Huli::Vulkan {
 
 ShaderModule::ShaderModule(const Context* context, const std::string& filePath,
                            const std::string& entryPoint, VkShaderStageFlagBits stages,
@@ -97,19 +97,19 @@ static constexpr uint32_t MAX_RESOURCES_COUNT = 1000;
 
 #ifdef _WIN32
 EShLanguage ShaderModule::shaderStageFromFileName(const char* fileName) {
-  if (util::endsWith(fileName, ".vert")) {
+  if (Util::endsWith(fileName, ".vert")) {
     return EShLangVertex;
-  } else if (util::endsWith(fileName, ".frag")) {
+  } else if (Util::endsWith(fileName, ".frag")) {
     return EShLangFragment;
-  } else if (util::endsWith(fileName, ".comp")) {
+  } else if (Util::endsWith(fileName, ".comp")) {
     return EShLangCompute;
-  } else if (util::endsWith(fileName, ".rgen")) {
+  } else if (Util::endsWith(fileName, ".rgen")) {
     return EShLangRayGen;
-  } else if (util::endsWith(fileName, ".rmiss")) {
+  } else if (Util::endsWith(fileName, ".rmiss")) {
     return EShLangMiss;
-  } else if (util::endsWith(fileName, ".rchit")) {
+  } else if (Util::endsWith(fileName, ".rchit")) {
     return EShLangClosestHit;
-  } else if (util::endsWith(fileName, ".rahit")) {
+  } else if (Util::endsWith(fileName, ".rahit")) {
     return EShLangAnyHit;
   } else {
     ASSERT(false, "Add if/else for GLSL stage");
@@ -279,8 +279,8 @@ std::vector<char> ShaderModule::glslToSpirv(const std::vector<char>& data,
 void ShaderModule::createShader(const std::string& filePath,
                                 const std::string& entryPoint, const std::string& name) {
   std::vector<char> spirv;
-  const bool isBinary = util::endsWith(filePath.c_str(), ".spv");
-  std::vector<char> fileData = util::readFile(filePath, isBinary);
+  const bool isBinary = Util::endsWith(filePath.c_str(), ".spv");
+  std::vector<char> fileData = Util::readFile(filePath, isBinary);
   std::filesystem::path file(filePath);
   if (isBinary) {
     spirv = std::move(fileData);
@@ -308,4 +308,4 @@ void ShaderModule::createShader(const std::vector<char>& spirv,
                             "Shader Module: " + name);
 }
 
-}  // namespace VulkanCore
+}  // namespace Huli::Vulkan

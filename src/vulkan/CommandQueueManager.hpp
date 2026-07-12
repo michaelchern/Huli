@@ -8,7 +8,7 @@
 #include "Common.hpp"
 #include "Utility.hpp"
 
-namespace VulkanCore {
+namespace Huli::Vulkan {
 
 class Context;
 
@@ -69,4 +69,4 @@ class CommandQueueManager final {
   std::vector<std::vector<std::function<void()>>> deallocators_;
 };
 
-}  // namespace VulkanCore
+}  // namespace Huli::Vulkan
