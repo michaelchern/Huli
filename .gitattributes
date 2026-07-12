@@ -1,5 +1,42 @@
-*.md text eol=lf
-*.ps1 text eol=lf
-*.py text eol=lf
-*.yaml text eol=lf
-.gitignore text eol=lf
+# Normalize every detected text file to LF in the repository and worktree.
+* text=auto eol=lf
+
+# Keep Windows command scripts compatible with cmd.exe.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Improve function context in C and C++ diffs.
+*.c diff=cpp
+*.cc diff=cpp
+*.cpp diff=cpp
+*.cxx diff=cpp
+*.h diff=cpp
+*.hh diff=cpp
+*.hpp diff=cpp
+*.hxx diff=cpp
+*.inl diff=cpp
+*.tpp diff=cpp
+*.ixx diff=cpp
+*.cppm diff=cpp
+
+# Common binary documents, archives, and images.
+*.7z binary
+*.bmp binary
+*.gif binary
+*.gz binary
+*.ico binary
+*.jpeg binary
+*.jpg binary
+*.pdf binary
+*.png binary
+*.webp binary
+*.zip binary
+
+# Common binary assets in graphics projects.
+*.dds binary
+*.glb binary
+*.ktx binary
+*.ktx2 binary
+*.spv binary
+
+# Add Git LFS, export-ignore, or GitHub Linguist rules only when a project uses them.
