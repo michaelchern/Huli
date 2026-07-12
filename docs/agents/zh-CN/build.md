@@ -7,7 +7,8 @@
 - Huli 使用 CMake 3.28+、C++20、Ninja Multi-Config、MSVC、Clang 和 Vulkan SDK。
 - 根 `CMakeLists.txt` 已声明 `project(Huli)`，会下载、配置并构建第三方依赖。
 - Vulkan SDK `1.4.350.0` 是当前验证和推荐基线，不代表根 CMake 会拒绝所有其他 SDK 版本。
-- 根文件末尾的 Huli 源码 `add_subdirectory(...)` 仍处于注释状态；当前构建验证依赖目标，不代表已经生成 Huli 应用、编译 `src/vulkan` 或完成 Vulkan 运行验证。
+- 根文件已通过 `add_subdirectory(src/vulkan)` 接入 `huli_vulkan` 静态库，并提供 `Huli::Vulkan` 别名；尚未生成 Huli 应用或接入 Vulkan 运行入口。
+- `src/vulkan/CMakeLists.txt` 使用目标级 include、编译特性和依赖范围；公开头文件暴露的依赖使用 `PUBLIC`，仅实现使用的依赖使用 `PRIVATE`，实际目标清单以实时文件为准。
 
 ## 实时权威与环境
 
@@ -48,11 +49,12 @@ VULKAN_SDK=C:\VulkanSDK\1.4.350.0
 $env:VULKAN_SDK = "C:\VulkanSDK\1.4.350.0"
 
 cmake --preset ninja-msvc
+cmake --build --preset msvc-debug --target huli_vulkan --parallel 1
 cmake --build --preset msvc-debug --parallel 8
 cmake --build --preset msvc-debug --parallel 8
 ```
 
-配置必须出现 `Configuring done` 和 `Generating done`，完整构建必须以退出代码 `0` 结束。未修改输入时再次构建应显示 `ninja: no work to do.`。
+配置必须出现 `Configuring done` 和 `Generating done`，`huli_vulkan` 目标与完整构建都必须以退出代码 `0` 结束。未修改输入时再次构建应显示 `ninja: no work to do.`。
 
 Clang 配置使用 `cmake --preset ninja-clang` 和对应的 `clang-*` build preset。普通 PowerShell 找不到 MSVC 头文件、Windows SDK 或库时，使用 Visual Studio Developer PowerShell，或先调用对应安装目录中的 `VsDevCmd.bat -arch=x64 -host_arch=x64`；Clang 构建也应在该环境中运行，以稳定获得 Windows SDK。
 
@@ -66,7 +68,7 @@ cmake --preset ninja-msvc-tracy
 cmake --build --preset msvc-tracy-release --parallel 8
 ```
 
-ASan preset 通过 `CFLAGS` / `CXXFLAGS` 添加 `/fsanitize=address`，并使用 RelWithDebInfo 避免 MSVC Debug 默认 `/RTC1` 冲突。Tracy preset 将 `TRACY_ENABLE` 和 `TRACY_CALLSTACK` 设为 `ON`。当前根构建仍只覆盖第三方依赖；这些专项配置不能证明 Huli 应用已完成插桩或 Tracy 运行采集。
+ASan preset 通过 `CFLAGS` / `CXXFLAGS` 添加 `/fsanitize=address`，并使用 RelWithDebInfo 避免 MSVC Debug 默认 `/RTC1` 冲突。Tracy preset 将 `TRACY_ENABLE` 和 `TRACY_CALLSTACK` 设为 `ON`。当前根构建包含依赖和 `huli_vulkan`，但没有 Huli 应用；这些专项配置不能证明应用插桩、Tracy 运行采集或 Vulkan runtime 已通过。
 
 ## 常见日志判断
 
@@ -82,6 +84,7 @@ ASan preset 通过 `CFLAGS` / `CXXFLAGS` 添加 `/fsanitize=address`，并使用
 - `.gitignore` 按生成目录和工具本地状态组织；不要全局忽略源码、shader 或 `.exe` / `.dll` / `.lib` 等可能合法提交的预编译文件。`CMakePresets.json` 可以进入版本库，`CMakeUserPresets.json` 必须保持忽略。
 - 修改 `.gitignore` 后，用 `git check-ignore -v --no-index` 同时验证应忽略与不应忽略的代表路径，不要用清理命令代替规则检查。
 - CMake、依赖版本或构建选项改动后，运行全新目录配置、完整构建和 `git diff --check`。
+- 修改 `huli_vulkan` 的依赖范围后，除编译静态库外，还要用临时下游 executable 仅链接 `Huli::Vulkan`；静态库归档成功不能发现所有缺失的最终链接依赖。
 - 纯文档改动不要求重新编译，但必须运行 `tools/sync-agents.ps1 -Check` 和 `git diff --check`。
 - 一次性工具版本、构建目录和验证结果写入带日期与命令的 `docs/tasks/` 文档，不要升级为无时间边界的长期规则。
-- 如果只验证了第三方依赖，明确报告验证范围；不要声称 Huli 应用、`src/vulkan` 或 Vulkan 运行路径已经通过。
+- 如果只验证了第三方依赖或 `huli_vulkan` 编译，明确报告验证范围；不要据此声称 Huli 应用或 Vulkan 运行路径已经通过。

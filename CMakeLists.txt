@@ -313,7 +313,7 @@ if (GLSLANG_LIB)
 endif()
 ]]
 
-#add_subdirectory(source/vulkancore)
+add_subdirectory(src/vulkan)
 #add_subdirectory(source/enginecore)
 #if(WIN32)
 #add_subdirectory(source/chapter1)

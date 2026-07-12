@@ -1,5 +1,5 @@
 # Huli Build Context
-<!-- AGENT_DOCS_BUILD_ZH_CN_SHA256: 6da0ef8e04fe9a8c996cafdbf8bc262d00c6a4665ade1ac08252819f63c13160 -->
+<!-- AGENT_DOCS_BUILD_ZH_CN_SHA256: fbd315998827e70713b3ee42215202884324a2a17c20f00b956905aa9db092a6 -->
 
 Load this file only for CMake, build, Visual Studio, validation-command, or compiler-error work.
 
@@ -8,7 +8,8 @@ Load this file only for CMake, build, Visual Studio, validation-command, or comp
 - Huli uses CMake 3.28+, C++20, Ninja Multi-Config, MSVC, Clang, and the Vulkan SDK.
 - The root `CMakeLists.txt` declares `project(Huli)` and downloads, configures, and builds third-party dependencies.
 - Vulkan SDK `1.4.350.0` is the current validated and recommended baseline; this does not mean the root CMake rejects every other SDK version.
-- Huli source `add_subdirectory(...)` calls at the end of the root file remain commented out. The current build validates dependency targets; it does not generate a Huli application, compile `src/vulkan`, or validate a Vulkan runtime path.
+- The root build connects `src/vulkan` through `add_subdirectory(src/vulkan)`, builds the `huli_vulkan` static library, and provides the `Huli::Vulkan` alias. It still does not generate a Huli application or connect the Vulkan runtime entrypoint.
+- `src/vulkan/CMakeLists.txt` uses target-scoped includes, compile features, and dependency visibility. Dependencies exposed by public headers are `PUBLIC`; implementation-only dependencies are `PRIVATE`. Read the live file for the actual target list.
 
 ## Live Authority and Environment
 
@@ -49,11 +50,12 @@ Run from Visual Studio Developer PowerShell or another shell with the MSVC envir
 $env:VULKAN_SDK = "C:\VulkanSDK\1.4.350.0"
 
 cmake --preset ninja-msvc
+cmake --build --preset msvc-debug --target huli_vulkan --parallel 1
 cmake --build --preset msvc-debug --parallel 8
 cmake --build --preset msvc-debug --parallel 8
 ```
 
-Configure must report `Configuring done` and `Generating done`; the complete build must exit with code `0`. A second unchanged build should report `ninja: no work to do.`
+Configure must report `Configuring done` and `Generating done`; both the `huli_vulkan` target and the complete build must exit with code `0`. A second unchanged build should report `ninja: no work to do.`
 
 Configure Clang with `cmake --preset ninja-clang` and use the corresponding `clang-*` build preset. If plain PowerShell cannot find MSVC headers, the Windows SDK, or libraries, use Visual Studio Developer PowerShell or first call the installed `VsDevCmd.bat -arch=x64 -host_arch=x64`. Run Clang builds in the same environment so Windows SDK discovery stays deterministic.
 
@@ -67,7 +69,7 @@ cmake --preset ninja-msvc-tracy
 cmake --build --preset msvc-tracy-release --parallel 8
 ```
 
-The ASan preset adds `/fsanitize=address` through `CFLAGS` / `CXXFLAGS` and uses RelWithDebInfo to avoid MSVC Debug's default `/RTC1` conflict. The Tracy preset sets `TRACY_ENABLE` and `TRACY_CALLSTACK` to `ON`. The root build still covers third-party dependencies only; these specialized configurations do not prove that a Huli application is instrumented or collecting Tracy data.
+The ASan preset adds `/fsanitize=address` through `CFLAGS` / `CXXFLAGS` and uses RelWithDebInfo to avoid MSVC Debug's default `/RTC1` conflict. The Tracy preset sets `TRACY_ENABLE` and `TRACY_CALLSTACK` to `ON`. The root build contains dependencies and `huli_vulkan`, but no Huli application; these configurations do not prove application instrumentation, Tracy runtime collection, or Vulkan runtime behavior.
 
 ## Reading Common Logs
 
@@ -83,6 +85,7 @@ The ASan preset adds `/fsanitize=address` through `CFLAGS` / `CXXFLAGS` and uses
 - Organize `.gitignore` around generated directories and tool-local state. Do not globally ignore source files, shaders, or potentially intentional prebuilt files such as `.exe`, `.dll`, and `.lib`. `CMakePresets.json` may be version-controlled; `CMakeUserPresets.json` must stay ignored.
 - After changing `.gitignore`, use `git check-ignore -v --no-index` to test representative paths that should and should not be ignored. Do not substitute cleanup commands for rule validation.
 - After CMake, dependency-version, or build-option changes, run a fresh configure, complete build, and `git diff --check`.
+- After changing `huli_vulkan` dependency visibility, compile the static library and link a temporary downstream executable against `Huli::Vulkan`; archive creation alone cannot expose every missing final-link dependency.
 - Docs-only changes do not require a rebuild, but must pass `tools/sync-agents.ps1 -Check` and `git diff --check`.
 - Put one-off tool versions, build directories, and validation results in dated `docs/tasks/` documents rather than promoting them to timeless domain rules.
-- If only dependencies were validated, report that exact scope; do not claim that a Huli application, `src/vulkan`, or Vulkan runtime path passed.
+- If only dependencies or `huli_vulkan` compilation were validated, report that exact scope; do not claim that a Huli application or Vulkan runtime path passed.

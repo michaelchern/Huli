@@ -6,7 +6,7 @@
 
 ## 1. 核心原则
 
-Huli 是一个 C++20 / Vulkan 学习仓库。根 CMake 已接入并可构建 Vulkan/图形第三方依赖；Huli 自身的应用目标与 Vulkan 运行入口尚未接入根构建。
+Huli 是一个 C++20 / Vulkan 学习仓库。根 CMake 已接入并可构建 Vulkan/图形第三方依赖与 `src/vulkan` 的 `huli_vulkan` 静态库；Huli 应用目标与 Vulkan 运行入口尚未接入根构建。
 
 AI 在本仓库工作时必须：
 
@@ -38,7 +38,7 @@ AI 在本仓库工作时必须：
 
 ## 3. 关键目录
 
-- `CMakeLists.txt`：根构建入口和实时依赖版本权威；当前可构建依赖目标，尚未接入 Huli 应用目标。
+- `CMakeLists.txt`：根构建入口和实时依赖版本权威；当前可构建依赖目标与 `huli_vulkan`，尚未接入 Huli 应用目标。
 - `docs/agents/`：按需加载的 AI 上下文包。
 - `docs/tasks/`：短小任务清单、主题学习状态、复现步骤和验证配方。
 - `.agents/skills/`：项目共享 Agent skill。
@@ -53,7 +53,7 @@ AI 在本仓库工作时必须：
 git diff --check
 ```
 
-C++ / CMake / shader / 示例改动按需运行最小相关验证。当前根 CMake 可以验证第三方依赖，但这不等于 Huli 应用或 Vulkan 运行路径已经接入；汇报时明确实际验证范围。
+C++ / CMake / shader / 示例改动按需运行最小相关验证。当前根 CMake 可以验证第三方依赖和 `huli_vulkan` 编译，但这不等于 Huli 应用或 Vulkan 运行路径已经接入；汇报时明确实际验证范围。
 
 纯文档改动通常不需要 CMake 构建。
 

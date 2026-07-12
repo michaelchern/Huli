@@ -1,10 +1,10 @@
 # Huli Build Smoke
-<!-- TASK_DOCS_BUILD_SMOKE_ZH_CN_SHA256: 293d38c6c7e1bfd46b31a4dcb98e601cd03d1da903ab5d7c9b8f37a728844bd1 -->
+<!-- TASK_DOCS_BUILD_SMOKE_ZH_CN_SHA256: 9cf101b2c84689bc528e214f0f81db3808fbc19e17e6b82ae3a9eb779711ad73 -->
 
 ## Current Facts
 
-- The root `CMakeLists.txt` can configure and build third-party dependencies.
-- Huli application targets and `src/vulkan` are not connected to the root build, so a successful dependency build is not application compilation or Vulkan runtime validation.
+- The root `CMakeLists.txt` configures and builds third-party dependencies plus the `huli_vulkan` static library from `src/vulkan`.
+- Huli application targets and the Vulkan runtime entrypoint are still not connected. Successful `huli_vulkan` compilation is not application compilation or Vulkan runtime validation.
 - Read live dependency versions and conditions from `CMakeLists.txt`; this file stores validation entrypoints and dated evidence only.
 
 ## 2026-07-11 Validation Snapshot
@@ -16,13 +16,20 @@
 
 - `cmake --list-presets` lists four configure presets, and `cmake --build --list-presets` lists eight build presets.
 - Fresh `ninja-msvc` and `ninja-clang` configure runs succeeded. Their caches record MSVC 19.51 and the Clang 22.1.1 GNU-style driver respectively, Ninja Multi-Config, and Vulkan SDK `1.4.350.0`.
-- `msvc-debug` and `clang-debug` both completed the current root dependency build with exit code `0`. An unchanged second MSVC build returned `ninja: no work to do.`.
+- Before `src/vulkan` integration, `msvc-debug` and `clang-debug` both completed the then-current root dependency build with exit code `0`. An unchanged second MSVC build returned `ninja: no work to do.`.
 - `msvc-release`, `msvc-relwithdebinfo`, `clang-release`, and `clang-relwithdebinfo` each select the correct configuration ninja file within the existing toolchain build tree.
 - `msvc-asan-relwithdebinfo` completed a full build. Its cache and verbose compiler commands contain `/fsanitize=address` without Debug's `/RTC1`.
 - `msvc-tracy-release` completed a full build, and its cache records `TRACY_ENABLE=ON` and `TRACY_CALLSTACK=ON`.
 - The root project does not currently consume the preset's `BUILD_TESTING`, `GLI_TEST_ENABLE`, or `IMGUI_EXAMPLES` values, so configure reports a manually-specified variables unused warning. This warning is not a build failure, but do not claim those switches changed behavior until the corresponding root options are connected.
 
-## Fresh Dependency Check
+## 2026-07-12 Vulkan Module Integration Snapshot
+
+- The root CMake connects `src/vulkan` through `add_subdirectory(src/vulkan)`, builds `huli_vulkan`, and provides the `Huli::Vulkan` alias.
+- `cmake --build --preset msvc-debug --target huli_vulkan --parallel 1` and the corresponding Clang Debug target build both exited `0`, proving that the `src/vulkan` sources compile.
+- A temporary downstream executable linked only `Huli::Vulkan`, included `<vulkan/Context.hpp>`, and referenced both a Huli Vulkan symbol and `GetDefaultResources()`. Its MSVC compile, link, and run all exited `0`.
+- This smoke proves public include and final-link dependency propagation. It does not validate window creation, device creation, or Vulkan runtime behavior.
+
+## Fresh Build Check
 
 Run from PowerShell with the MSVC development environment loaded:
 
@@ -32,6 +39,7 @@ $env:VULKAN_SDK = "C:\VulkanSDK\1.4.350.0"
 
 cmake --list-presets
 cmake --preset ninja-msvc
+cmake --build --preset msvc-debug --target huli_vulkan --parallel 1
 cmake --build --preset msvc-debug --parallel 8
 cmake --build --preset msvc-debug --parallel 8
 ```
@@ -39,7 +47,7 @@ cmake --build --preset msvc-debug --parallel 8
 Acceptance criteria:
 
 - Configure reports `Configuring done` and `Generating done`.
-- The first complete build exits with code `0`.
+- Both the `huli_vulkan` target and the first complete build exit with code `0`.
 - The second unchanged build reports `ninja: no work to do.`.
 - `out/build/ninja-msvc/CMakeCache.txt` names the intended compiler, generator, and Vulkan SDK.
 
@@ -79,14 +87,14 @@ cmake --build --preset msvc-tracy-release --parallel 8
 
 - The ASan cache or verbose compiler command must contain `/fsanitize=address`, and the configuration must be `RelWithDebInfo`.
 - The Tracy cache must record `TRACY_ENABLE=ON` and `TRACY_CALLSTACK=ON`, and the configuration must be `Release`.
-- The root build does not connect a Huli application or `src/vulkan`. A successful specialized preset only proves that the current dependency build accepts the configuration, not that runtime instrumentation, profiling, or the Vulkan path has passed.
+- The ASan and Tracy snapshots above predate `src/vulkan` integration. Until those specialized presets are rerun, do not claim that `huli_vulkan` is instrumented, and never treat them as runtime collection or Vulkan-path validation.
 
 ## Diagnosis
 
 - If MSVC standard headers, the Windows SDK, or the Vulkan SDK are missing, repair the development environment or clear the old cache first.
 - If Clang cannot find the Windows SDK or MSVC-compatible libraries, first confirm that it runs from Developer PowerShell and that `clang` / `clang++` are available on `PATH`. Do not put a personal absolute LLVM path in the shared preset.
 - If dependency download output stays quiet, inspect active `git` and CMake child processes before declaring it stuck.
-- Add application build and runtime smoke only after a Huli application target is connected; until then, do not report Vulkan runtime validation.
+- After changing `huli_vulkan` CMake or dependency visibility, run the module build and a temporary downstream link smoke. Add application and Vulkan runtime smoke only after a Huli application target is connected.
 - External study material or reference repositories are not fixed smoke entrypoints. Record their source and validation purpose only when the user explicitly selects them.
 
 ## Documentation Validation

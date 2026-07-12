@@ -1,5 +1,5 @@
 # Huli Agent Entry
-<!-- AGENTS_ZH_CN_SHA256: 660b3306860ed10cb268c22bd93e8a2747bd5cc3959424de80d80e2c0bbcc0ba -->
+<!-- AGENTS_ZH_CN_SHA256: 2fb65ede7db0cddef52bdfd38095a1097ed9944fc51434a2e5f54618f917fad9 -->
 
 > `AGENTS.zh-CN.md` is the Chinese source for the root AI entry.
 > Other Chinese sources live in `docs/agents/zh-CN/`, `docs/tasks/zh-CN/`, and `.agents/skills/*/SKILL.zh-CN.md`.
@@ -7,7 +7,7 @@
 
 ## 1. Core Rules
 
-Huli is a C++20 / Vulkan learning repository. Its root CMake project now integrates and builds Vulkan and graphics dependencies; Huli application targets and the Vulkan runtime entrypoint are not yet connected to the root build.
+Huli is a C++20 / Vulkan learning repository. Its root CMake project builds Vulkan and graphics dependencies plus the `huli_vulkan` static library from `src/vulkan`; Huli application targets and the Vulkan runtime entrypoint are not yet connected.
 
 When working in this repository:
 
@@ -39,7 +39,7 @@ These skills are plain Markdown and vendor-neutral; they are not Codex-specific.
 
 ## 3. Key Paths
 
-- `CMakeLists.txt`: root build entrypoint and live authority for dependency versions; it currently builds dependency targets but no Huli application target.
+- `CMakeLists.txt`: root build entrypoint and live authority for dependency versions; it currently builds dependencies and `huli_vulkan`, but no Huli application target.
 - `docs/agents/`: on-demand AI context packs.
 - `docs/tasks/`: short task checklists, topic study state, reproduction steps, and validation recipes.
 - `.agents/skills/`: shared project agent skills.
@@ -54,7 +54,7 @@ After changing agent docs or skills, check sync:
 git diff --check
 ```
 
-For C++, CMake, shader, or example changes, run the smallest relevant validation. The root project can validate dependencies, but that does not prove that a Huli application or Vulkan runtime path is connected. Report the exact validation scope.
+For C++, CMake, shader, or example changes, run the smallest relevant validation. The root project can validate dependencies and compile `huli_vulkan`, but that does not prove that a Huli application or Vulkan runtime path is connected. Report the exact validation scope.
 
 Docs-only changes usually do not require a CMake build.
 
