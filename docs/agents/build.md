@@ -1,5 +1,5 @@
 # Huli Build Context
-<!-- AGENT_DOCS_BUILD_ZH_CN_SHA256: fbd315998827e70713b3ee42215202884324a2a17c20f00b956905aa9db092a6 -->
+<!-- AGENT_DOCS_BUILD_ZH_CN_SHA256: 784430c087f3369b0d39066df29e8a84b1de661e4daab007f977ed64d2699aa4 -->
 
 Load this file only for CMake, build, Visual Studio, validation-command, or compiler-error work.
 
@@ -8,7 +8,7 @@ Load this file only for CMake, build, Visual Studio, validation-command, or comp
 - Huli uses CMake 3.28+, C++20, Ninja Multi-Config, MSVC, Clang, and the Vulkan SDK.
 - The root `CMakeLists.txt` declares `project(Huli)` and downloads, configures, and builds third-party dependencies.
 - Vulkan SDK `1.4.350.0` is the current validated and recommended baseline; this does not mean the root CMake rejects every other SDK version.
-- The root build connects `src/vulkan` through `add_subdirectory(src/vulkan)`, builds the `huli_vulkan` static library, and provides the `Huli::Vulkan` alias. It still does not generate a Huli application or connect the Vulkan runtime entrypoint.
+- The root build connects the `huli_vulkan` static library and the header-only `huli_render` target, and generates `huli_example1` on Windows. Successful target compilation and linking do not prove that the Vulkan runtime smoke passes.
 - `src/vulkan/CMakeLists.txt` uses target-scoped includes, compile features, and dependency visibility. Dependencies exposed by public headers are `PUBLIC`; implementation-only dependencies are `PRIVATE`. Read the live file for the actual target list.
 
 ## Live Authority and Environment
@@ -39,6 +39,8 @@ VULKAN_SDK=C:\VulkanSDK\1.4.350.0
 - The core Windows configure presets are `ninja-msvc` and `ninja-clang`, both using Ninja Multi-Config. The specialized presets are `ninja-msvc-asan` and `ninja-msvc-tracy`.
 - MSVC and Clang each provide Debug, Release, and RelWithDebInfo build presets. ASan uses MSVC RelWithDebInfo, while Tracy uses MSVC Release.
 - `ninja-clang` uses the GNU-style `clang` / `clang++` drivers, not `clang-cl`. Compilers are resolved by command name; do not put a developer's absolute LLVM path in the project preset.
+- Huli-owned sources and public headers contain UTF-8 Chinese comments. MSVC targets must use target-scoped `/utf-8`, and header targets must propagate that requirement with `PUBLIC` or `INTERFACE`. Do not hide `C4819` by removing Chinese comments or adding per-file BOMs.
+- Windows targets that may parse `std::min` or `std::max` after `windows.h` must provide `NOMINMAX` as a target-scoped compile definition before preprocessing starts. Do not rely on a later header definition or include order. If a header keeps a fallback definition, guard it against an existing `NOMINMAX` to avoid `C4005`.
 - Put machine paths, personal environment overrides, and experimental configurations in the ignored `CMakeUserPresets.json`. `VULKAN_SDK` continues to come from the environment that launches Visual Studio or the terminal.
 - After changing or adding a preset, run `cmake --list-presets`, confirm build directories are isolated, and inspect the resulting `CMakeCache.txt` for the intended generator, compiler, and Vulkan SDK.
 
@@ -51,11 +53,12 @@ $env:VULKAN_SDK = "C:\VulkanSDK\1.4.350.0"
 
 cmake --preset ninja-msvc
 cmake --build --preset msvc-debug --target huli_vulkan --parallel 1
+cmake --build --preset msvc-debug --target huli_example1 --parallel 1
 cmake --build --preset msvc-debug --parallel 8
 cmake --build --preset msvc-debug --parallel 8
 ```
 
-Configure must report `Configuring done` and `Generating done`; both the `huli_vulkan` target and the complete build must exit with code `0`. A second unchanged build should report `ninja: no work to do.`
+Configure must report `Configuring done` and `Generating done`; the `huli_vulkan` and `huli_example1` targets plus the complete build must exit with code `0`. A second unchanged build should report `ninja: no work to do.` These results prove compilation and linking only, not application startup or Vulkan validation.
 
 Configure Clang with `cmake --preset ninja-clang` and use the corresponding `clang-*` build preset. If plain PowerShell cannot find MSVC headers, the Windows SDK, or libraries, use Visual Studio Developer PowerShell or first call the installed `VsDevCmd.bat -arch=x64 -host_arch=x64`. Run Clang builds in the same environment so Windows SDK discovery stays deterministic.
 
@@ -69,7 +72,7 @@ cmake --preset ninja-msvc-tracy
 cmake --build --preset msvc-tracy-release --parallel 8
 ```
 
-The ASan preset adds `/fsanitize=address` through `CFLAGS` / `CXXFLAGS` and uses RelWithDebInfo to avoid MSVC Debug's default `/RTC1` conflict. The Tracy preset sets `TRACY_ENABLE` and `TRACY_CALLSTACK` to `ON`. The root build contains dependencies and `huli_vulkan`, but no Huli application; these configurations do not prove application instrumentation, Tracy runtime collection, or Vulkan runtime behavior.
+The ASan preset adds `/fsanitize=address` through `CFLAGS` / `CXXFLAGS` and uses RelWithDebInfo to avoid MSVC Debug's default `/RTC1` conflict. The Tracy preset sets `TRACY_ENABLE` and `TRACY_CALLSTACK` to `ON`. Although the root now contains `huli_example1`, the existing specialized-preset snapshots predate that integration; rerun them before claiming application instrumentation, Tracy runtime collection, or Vulkan runtime behavior.
 
 ## Reading Common Logs
 
@@ -77,6 +80,8 @@ The ASan preset adds `/fsanitize=address` through `CFLAGS` / `CXXFLAGS` and uses
 - `FetchContent_Populate(...) is deprecated` means an obsolete download pattern remains; the current root CMake should no longer emit it.
 - glslang HLSL-front-end deprecation and glTF-SDK future CMake compatibility messages are currently warnings, not configure failures.
 - The DLSS repository contains large files and submodules. Inspect active download processes before declaring a quiet first download stuck.
+- If MSVC reports `C4819` followed by cascading syntax errors near class declarations or preprocessor directives, first verify that the real compile command contains `/utf-8`; do not infer source corruption from the later line.
+- `C2589` near `std::min` or `std::max` commonly means the Windows `min` or `max` macro expanded; verify that `NOMINMAX` is active from compile start. `C4005: NOMINMAX` means a command-line definition and an unguarded header fallback overlap.
 - Diagnose the first `CMake Error`, `fatal:`, `FAILED:`, or MSVC `error Cxxxx`, rather than reasoning backward from the final exit code.
 
 ## Change and Validation Rules
@@ -88,4 +93,4 @@ The ASan preset adds `/fsanitize=address` through `CFLAGS` / `CXXFLAGS` and uses
 - After changing `huli_vulkan` dependency visibility, compile the static library and link a temporary downstream executable against `Huli::Vulkan`; archive creation alone cannot expose every missing final-link dependency.
 - Docs-only changes do not require a rebuild, but must pass `tools/sync-agents.ps1 -Check` and `git diff --check`.
 - Put one-off tool versions, build directories, and validation results in dated `docs/tasks/` documents rather than promoting them to timeless domain rules.
-- If only dependencies or `huli_vulkan` compilation were validated, report that exact scope; do not claim that a Huli application or Vulkan runtime path passed.
+- If only dependencies, `huli_vulkan`, or `huli_example1` compilation/linking were validated, report that exact scope; do not claim that the Vulkan runtime passed. A runtime smoke must launch the application with the Vulkan validation layer enabled, preserve the first VUID, and distinguish a validation-callback breakpoint from the underlying cause. A run with validation disabled proves only unchecked startup behavior.

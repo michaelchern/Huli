@@ -2,8 +2,8 @@
 
 ## 当前事实
 
-- 根 `CMakeLists.txt` 可以配置并构建第三方依赖与 `src/vulkan` 的 `huli_vulkan` 静态库。
-- Huli 应用目标和 Vulkan 运行入口尚未接入；`huli_vulkan` 编译成功不等于应用编译或 Vulkan 运行验证成功。
+- 根 `CMakeLists.txt` 可以配置并构建第三方依赖、`src/vulkan` 的 `huli_vulkan`、`src/render` 的 `huli_render`，以及 Windows 下的 `huli_example1`。
+- `huli_example1` 编译链接成功不等于 Vulkan runtime smoke 通过；必须在 Vulkan validation layer 已启用时单独检查应用启动、验证层输出和持续运行状态。禁用验证层的运行不能证明 Vulkan 使用正确。
 - 当前依赖版本与条件以实时 `CMakeLists.txt` 为准；本文件只保存验证入口和带日期的证据。
 
 ## 2026-07-11 验证快照
@@ -28,6 +28,14 @@
 - 临时下游 executable 只链接 `Huli::Vulkan`，包含 `<vulkan/Context.hpp>`，并引用 Huli Vulkan 符号与 `GetDefaultResources()`；MSVC 编译、链接和运行均退出 `0`。
 - 该 smoke 证明模块公开 include 与最终链接依赖可传递，不证明窗口、设备创建或 Vulkan runtime 行为。
 
+## 2026-07-14 应用编译与 Runtime 快照
+
+- `cmake --preset ninja-msvc` 配置成功；`huli_vulkan`、`huli_example1` 和完整 Debug 构建均退出 `0`，未修改输入时再次构建返回 `ninja: no work to do.`。
+- `huli_example1` 的 MSVC 编译命令包含 `/utf-8` 与 `-DNOMINMAX`，`C4819` 和 `std::min` 处的 `C2589` 不再出现。
+- `Common.hpp` 恢复为无外层 `NOMINMAX` 防重复检查的写法后，应用仍能编译链接，但会报告 `C4005: NOMINMAX` 宏重定义；这不是 runtime 退出原因，也不应被当作干净构建。
+- 在 `validationLayers` 包含 `VK_LAYER_KHRONOS_validation` 的状态下启动 Debug `huli_example1.exe`，程序完成 Vulkan instance、物理设备、surface 与逻辑设备创建路径的前置输出，但验证层首先报告 `VUID-VkDeviceCreateInfo-enabledLayerCount-12384`：当前 `VkDeviceCreateInfo` 仍把 instance validation layers 传给 device layers。
+- `debugMessengerCallback` 收到 error severity 后调用 `__debugbreak()`；5 秒存活检查确认进程以 `0x80000003` 退出。因此本快照只证明应用可编译、链接并进入 Vulkan 初始化，不证明可持续运行或 runtime 验证通过。
+
 ## 全新构建检查
 
 在已经加载 MSVC 开发环境的 PowerShell 中运行：
@@ -39,6 +47,7 @@ $env:VULKAN_SDK = "C:\VulkanSDK\1.4.350.0"
 cmake --list-presets
 cmake --preset ninja-msvc
 cmake --build --preset msvc-debug --target huli_vulkan --parallel 1
+cmake --build --preset msvc-debug --target huli_example1 --parallel 1
 cmake --build --preset msvc-debug --parallel 8
 cmake --build --preset msvc-debug --parallel 8
 ```
@@ -46,9 +55,10 @@ cmake --build --preset msvc-debug --parallel 8
 验收标准：
 
 - 配置日志包含 `Configuring done` 和 `Generating done`。
-- `huli_vulkan` 目标和第一次完整构建都退出 `0`。
+- `huli_vulkan`、`huli_example1` 和第一次完整构建都退出 `0`。
 - 未修改输入时第二次构建显示 `ninja: no work to do.`。
 - `out/build/ninja-msvc/CMakeCache.txt` 中的编译器、生成器和 Vulkan SDK 与预期一致。
+- 如果需要声称 runtime 通过，必须确认 Vulkan validation layer 已启用，再另行启动 `out/build/ninja-msvc/examples/example1/Debug/huli_example1.exe`，确认没有 error VUID、断点异常或提前退出。
 
 Clang 使用同一个开发环境，但改用独立配置和构建树：
 
@@ -93,7 +103,7 @@ cmake --build --preset msvc-tracy-release --parallel 8
 - MSVC 标准头、Windows SDK 或 Vulkan SDK 找不到时，先修复开发环境或清理旧缓存。
 - Clang 找不到 Windows SDK 或 MSVC 兼容库时，先确认在 Developer PowerShell 中运行，并检查 `clang` / `clang++` 是否可从 `PATH` 找到；不要把个人 LLVM 绝对路径写进共享 preset。
 - 依赖下载长时间无日志时，先检查 `git`/CMake 子进程，再判断是否卡死。
-- 修改 `huli_vulkan` 的 CMake 或依赖范围后，运行模块编译和临时下游链接 smoke；只有 Huli 应用目标接入后，才增加应用与 Vulkan runtime smoke。
+- 修改 `huli_vulkan` 的 CMake 或依赖范围后，运行模块编译和临时下游链接 smoke；修改 `huli_render`、示例或 Windows 编译定义后，额外构建 `huli_example1`。只有在验证层启用时显式启动应用并检查首个 VUID 与持续运行状态，才能声称 Vulkan runtime smoke 通过。
 - 外部教材或参考仓库不属于固定 smoke 入口；只有用户明确指定时才单独记录来源和验证目的。
 
 ## 文档验证

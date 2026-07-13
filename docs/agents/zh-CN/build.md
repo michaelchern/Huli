@@ -7,7 +7,7 @@
 - Huli 使用 CMake 3.28+、C++20、Ninja Multi-Config、MSVC、Clang 和 Vulkan SDK。
 - 根 `CMakeLists.txt` 已声明 `project(Huli)`，会下载、配置并构建第三方依赖。
 - Vulkan SDK `1.4.350.0` 是当前验证和推荐基线，不代表根 CMake 会拒绝所有其他 SDK 版本。
-- 根文件已通过 `add_subdirectory(src/vulkan)` 接入 `huli_vulkan` 静态库，并提供 `Huli::Vulkan` 别名；尚未生成 Huli 应用或接入 Vulkan 运行入口。
+- 根文件已接入 `huli_vulkan` 静态库、`huli_render` 头文件目标，并在 Windows 下生成 `huli_example1`；目标编译链接成功不代表 Vulkan runtime smoke 已通过。
 - `src/vulkan/CMakeLists.txt` 使用目标级 include、编译特性和依赖范围；公开头文件暴露的依赖使用 `PUBLIC`，仅实现使用的依赖使用 `PRIVATE`，实际目标清单以实时文件为准。
 
 ## 实时权威与环境
@@ -38,6 +38,8 @@ VULKAN_SDK=C:\VulkanSDK\1.4.350.0
 - Windows 核心 configure presets 是 `ninja-msvc` 和 `ninja-clang`，都使用 Ninja Multi-Config；专项 presets 是 `ninja-msvc-asan` 和 `ninja-msvc-tracy`。
 - MSVC 和 Clang 各提供 Debug、Release、RelWithDebInfo build preset；ASan 使用 MSVC RelWithDebInfo，Tracy 使用 MSVC Release。
 - `ninja-clang` 使用 `clang` / `clang++` GNU 风格驱动，不是 `clang-cl`。编译器只按命令名查找，不能把个人 LLVM 安装绝对路径写入项目 preset。
+- Huli 自有源码和公开头文件包含 UTF-8 中文注释；MSVC 目标必须通过目标级编译选项使用 `/utf-8`，头文件目标还要用 `PUBLIC` 或 `INTERFACE` 把该要求传给消费者。遇到 `C4819` 时不要删除中文注释或逐文件添加 BOM 来掩盖配置缺失。
+- Windows 目标若可能在 `windows.h` 之后解析 `std::min` / `std::max`，应通过目标级 compile definition 在预处理开始前提供 `NOMINMAX`；不要依赖较晚的头文件定义或 include 顺序。头文件若保留本地兜底定义，必须先检查 `NOMINMAX` 是否已经存在，避免 `C4005`。
 - 本机路径、个人环境覆盖或实验配置写入已忽略的 `CMakeUserPresets.json`；`VULKAN_SDK` 继续由启动 Visual Studio 或终端的环境提供。
 - 修改或新增 preset 后，至少运行 `cmake --list-presets`、确认构建目录相互隔离，并检查实际 `CMakeCache.txt` 使用了预期生成器、编译器和 Vulkan SDK。
 
@@ -50,11 +52,12 @@ $env:VULKAN_SDK = "C:\VulkanSDK\1.4.350.0"
 
 cmake --preset ninja-msvc
 cmake --build --preset msvc-debug --target huli_vulkan --parallel 1
+cmake --build --preset msvc-debug --target huli_example1 --parallel 1
 cmake --build --preset msvc-debug --parallel 8
 cmake --build --preset msvc-debug --parallel 8
 ```
 
-配置必须出现 `Configuring done` 和 `Generating done`，`huli_vulkan` 目标与完整构建都必须以退出代码 `0` 结束。未修改输入时再次构建应显示 `ninja: no work to do.`。
+配置必须出现 `Configuring done` 和 `Generating done`，`huli_vulkan`、`huli_example1` 与完整构建都必须以退出代码 `0` 结束。未修改输入时再次构建应显示 `ninja: no work to do.`；这些结果只证明编译链接，不替代应用启动与 Vulkan 验证层检查。
 
 Clang 配置使用 `cmake --preset ninja-clang` 和对应的 `clang-*` build preset。普通 PowerShell 找不到 MSVC 头文件、Windows SDK 或库时，使用 Visual Studio Developer PowerShell，或先调用对应安装目录中的 `VsDevCmd.bat -arch=x64 -host_arch=x64`；Clang 构建也应在该环境中运行，以稳定获得 Windows SDK。
 
@@ -68,7 +71,7 @@ cmake --preset ninja-msvc-tracy
 cmake --build --preset msvc-tracy-release --parallel 8
 ```
 
-ASan preset 通过 `CFLAGS` / `CXXFLAGS` 添加 `/fsanitize=address`，并使用 RelWithDebInfo 避免 MSVC Debug 默认 `/RTC1` 冲突。Tracy preset 将 `TRACY_ENABLE` 和 `TRACY_CALLSTACK` 设为 `ON`。当前根构建包含依赖和 `huli_vulkan`，但没有 Huli 应用；这些专项配置不能证明应用插桩、Tracy 运行采集或 Vulkan runtime 已通过。
+ASan preset 通过 `CFLAGS` / `CXXFLAGS` 添加 `/fsanitize=address`，并使用 RelWithDebInfo 避免 MSVC Debug 默认 `/RTC1` 冲突。Tracy preset 将 `TRACY_ENABLE` 和 `TRACY_CALLSTACK` 设为 `ON`。当前根构建虽包含 `huli_example1`，但旧的专项 preset 快照早于该应用接入；重新验证前不能声称应用插桩、Tracy 运行采集或 Vulkan runtime 已通过。
 
 ## 常见日志判断
 
@@ -76,6 +79,8 @@ ASan preset 通过 `CFLAGS` / `CXXFLAGS` 添加 `/fsanitize=address`，并使用
 - `FetchContent_Populate(...) is deprecated` 表示仍有旧下载写法；当前根 CMake 不应再产生该警告。
 - glslang 的 HLSL 前端弃用提示和 glTF-SDK 的 CMake 未来兼容提示目前是 warning，不是配置失败。
 - DLSS 仓库包含大文件和子模块，首次下载可能长时间无新日志；先检查下载进程再判断是否卡死。
+- MSVC `C4819` 后紧跟类声明、预处理指令等连带语法错误时，先检查真实编译命令是否包含 `/utf-8`；不要从后续错误行反推代码损坏。
+- `std::min` / `std::max` 附近的 `C2589` 常见于 Windows `min` / `max` 宏展开，检查 `NOMINMAX` 是否从编译开始生效；`C4005: NOMINMAX` 则表示命令行定义与头文件兜底重复且未加保护。
 - 排错时先找第一条 `CMake Error`、`fatal:`、`FAILED:` 或 MSVC `error Cxxxx`，不要从最后的退出代码反推原因。
 
 ## 修改与验证规则
@@ -87,4 +92,4 @@ ASan preset 通过 `CFLAGS` / `CXXFLAGS` 添加 `/fsanitize=address`，并使用
 - 修改 `huli_vulkan` 的依赖范围后，除编译静态库外，还要用临时下游 executable 仅链接 `Huli::Vulkan`；静态库归档成功不能发现所有缺失的最终链接依赖。
 - 纯文档改动不要求重新编译，但必须运行 `tools/sync-agents.ps1 -Check` 和 `git diff --check`。
 - 一次性工具版本、构建目录和验证结果写入带日期与命令的 `docs/tasks/` 文档，不要升级为无时间边界的长期规则。
-- 如果只验证了第三方依赖或 `huli_vulkan` 编译，明确报告验证范围；不要据此声称 Huli 应用或 Vulkan 运行路径已经通过。
+- 如果只验证了第三方依赖、`huli_vulkan` 或 `huli_example1` 编译链接，明确报告验证范围；不要据此声称 Vulkan 运行路径已经通过。runtime smoke 必须在 Vulkan validation layer 已启用时单独启动应用、保留第一条 VUID，并区分验证回调断点与真正根因；禁用验证层只能证明未检查状态下的启动行为。

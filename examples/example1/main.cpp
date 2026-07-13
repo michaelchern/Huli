@@ -27,7 +27,7 @@ bool initWindow(GLFWwindow** outWindow)
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-    const char* title = "Chapter 1 - Triangle";
+    const char* title = "Example 1 - Triangle";
 
     uint32_t posX = 200;
     uint32_t posY = 200;
@@ -80,7 +80,7 @@ int main(int argc, char** argv)
 
     std::vector<std::string> validationLayers;
 #ifdef _DEBUG
-    validationLayers.push_back("VK_LAYER_KHRONOS_validation");
+    // validationLayers.push_back("VK_LAYER_KHRONOS_validation");
 #endif
 
     // Create Context
@@ -106,7 +106,8 @@ int main(int argc, char** argv)
     const VkRect2D renderArea = {.offset = {.x = 0, .y = 0}, .extent = extents};
 
     // Create Shader Modules
-    const auto shadersPath = std::filesystem::current_path() / "resources/shaders";
+    // const auto shadersPath = std::filesystem::current_path() / "resources/shaders";
+    const auto shadersPath = std::filesystem::path{HULI_EXAMPLE1_RESOURCE_DIR} / "shaders";
     const auto vertexShaderPath = shadersPath / "triangle.vert";
     const auto fragShaderPath = shadersPath / "triangle.frag";
     const auto vertexShader = context.createShaderModule(vertexShaderPath.string(), VK_SHADER_STAGE_VERTEX_BIT);
@@ -144,8 +145,7 @@ int main(int argc, char** argv)
         renderPass->vkRenderPass());
 
     // Create Command Manager
-    auto commandMgr =
-        context.createGraphicsCommandQueue(context.swapchain()->numberImages(), context.swapchain()->numberImages());
+    auto commandMgr = context.createGraphicsCommandQueue(context.swapchain()->numberImages(), context.swapchain()->numberImages());
 
     // FPS Counter
     Huli::Render::FPSCounter fps(glfwGetTime());

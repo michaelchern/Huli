@@ -10,3 +10,15 @@ target_include_directories(
 )
 
 target_compile_features(huli_render INTERFACE cxx_std_20)
+
+target_compile_options(
+  huli_render
+  INTERFACE
+    $<$<COMPILE_LANG_AND_ID:CXX,MSVC>:/utf-8>
+)
+
+target_compile_definitions(
+  huli_render
+  INTERFACE
+    $<$<PLATFORM_ID:Windows>:NOMINMAX>
+)

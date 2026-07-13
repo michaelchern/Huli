@@ -51,3 +51,9 @@ target_link_libraries(
 )
 
 target_compile_features(huli_vulkan PUBLIC cxx_std_20)
+
+target_compile_options(
+  huli_vulkan
+  PUBLIC
+    $<$<COMPILE_LANG_AND_ID:CXX,MSVC>:/utf-8>
+)
