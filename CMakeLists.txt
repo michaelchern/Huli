@@ -94,34 +94,34 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(gli)
 ]]
 
-#[[ 当前 Vulkan 源码直接通过平台 API 创建 Surface，尚未使用 ImGui 或 GLFW。
 if (NOT ANDROID)
   # Dear ImGui：为工具界面和调试界面提供立即模式 UI 控件。
-  FetchContent_Declare(
-    imgui
-    GIT_REPOSITORY https://github.com/ocornut/imgui.git
-    GIT_TAG v1.92.8
-    GIT_SHALLOW TRUE
-    SOURCE_SUBDIR _huli_skip_cmake
-  )
-  FetchContent_MakeAvailable(imgui)
-  add_library(
-    imgui STATIC
-    ${imgui_SOURCE_DIR}/imgui.cpp
-    ${imgui_SOURCE_DIR}/imgui_draw.cpp
-    ${imgui_SOURCE_DIR}/imgui_demo.cpp
-    ${imgui_SOURCE_DIR}/imgui_tables.cpp
-    ${imgui_SOURCE_DIR}/imgui_widgets.cpp
-    ${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.cpp
-    ${imgui_SOURCE_DIR}/backends/imgui_impl_vulkan.cpp
-  )
-  target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR})
-  target_compile_definitions(imgui PUBLIC IMGUI_IMPL_VULKAN_NO_PROTOTYPES)
+#  FetchContent_Declare(
+#    imgui
+#    GIT_REPOSITORY https://github.com/ocornut/imgui.git
+#    GIT_TAG v1.92.8
+#    GIT_SHALLOW TRUE
+#    SOURCE_SUBDIR _huli_skip_cmake
+#  )
+#  FetchContent_MakeAvailable(imgui)
+#  add_library(
+#    imgui STATIC
+#    ${imgui_SOURCE_DIR}/imgui.cpp
+#    ${imgui_SOURCE_DIR}/imgui_draw.cpp
+#    ${imgui_SOURCE_DIR}/imgui_demo.cpp
+#    ${imgui_SOURCE_DIR}/imgui_tables.cpp
+#    ${imgui_SOURCE_DIR}/imgui_widgets.cpp
+#    ${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.cpp
+#    ${imgui_SOURCE_DIR}/backends/imgui_impl_vulkan.cpp
+#  )
+#  target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR})
+#  target_compile_definitions(imgui PUBLIC IMGUI_IMPL_VULKAN_NO_PROTOTYPES)
 
   # GLFW：创建桌面窗口，并提供键盘、鼠标和 Vulkan Surface 集成。
   set(GLFW_BUILD_DOCS OFF CACHE BOOL "不构建 GLFW 文档" FORCE)
   set(GLFW_BUILD_TESTS OFF CACHE BOOL "不构建 GLFW 测试" FORCE)
   set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "不构建 GLFW 示例" FORCE)
+  set(GLFW_INSTALL OFF CACHE BOOL "不生成 GLFW 安装规则" FORCE)
   FetchContent_Declare(
     glfw
     GIT_REPOSITORY https://github.com/glfw/glfw.git
@@ -130,7 +130,6 @@ if (NOT ANDROID)
   )
   FetchContent_MakeAvailable(glfw)
 endif()
-]]
 
 #[[ 当前 Vulkan 源码尚未使用 stb；保留配置供图像和字体加载功能恢复。
 # stb：提供图像读取、图像写入、字体处理等单头文件工具。
@@ -314,13 +313,13 @@ endif()
 ]]
 
 add_subdirectory(src/vulkan)
-#add_subdirectory(source/enginecore)
-#if(WIN32)
-#add_subdirectory(source/chapter1)
+add_subdirectory(src/render)
+if(WIN32)
+add_subdirectory(examples/example1)
 #add_subdirectory(source/chapter2)
 #add_subdirectory(source/chapter3)
 #add_subdirectory(source/chapter4)
 #add_subdirectory(source/chapter5)
 #add_subdirectory(source/chapter6)
 #add_subdirectory(source/chapter7)
-#endif()
+endif()
