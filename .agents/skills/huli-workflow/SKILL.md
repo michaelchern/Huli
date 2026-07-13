@@ -2,7 +2,7 @@
 name: huli-workflow
 description: Vendor-neutral workflow for AI agents working in the Huli C++ Vulkan learning repository. Use when an agent edits this repo, handles =sa/=ca/=ai/=gc/=cm/=gh commands, or needs routing to build, GitHub, formatting, Vulkan, or learning context.
 ---
-<!-- HULI_WORKFLOW_SKILL_ZH_CN_SHA256: de6e3eebf31653f9e6c53d99252493c8202e7543730190b23041d2a07b813bc2 -->
+<!-- HULI_WORKFLOW_SKILL_ZH_CN_SHA256: 6476b2cf435fce8db36040e385a698db9a449ad60c0e9626b293c4c560edf99d -->
 
 # Huli Workflow
 
@@ -54,6 +54,12 @@ For `=gc`, `=cm`, and `=gh`, read `docs/agents/git.md` before acting.
 - Study notes and topic state: `docs/agents/learning.md`
 
 If a context pack is missing, inspect source files directly and keep the answer explicit about assumptions.
+
+## Source Documentation and Formatting Intent
+
+- When the user names a `.hpp` file and asks to add comments and format it, inspect the matching `.cpp` and call sites first. Add Chinese Doxygen comments focused on public responsibilities, ownership, lifetime, synchronization, preconditions, and current implementation boundaries. Do not change declarations or code logic unless explicitly requested.
+- When the user names a `.cpp` file and asks to format or adjust formatting, or says not to change code, treat it as a strict format-only task. Apply only the root `.clang-format`; do not add comments, clean up includes, reorder functions, rename, refactor, or opportunistically fix logic. Report deeper issues separately.
+- Before these edits, inspect the target file's diff so existing user changes are not overwritten. Afterward, run target-scoped `clang-format --dry-run --Werror --style=file`, `git diff --check`, and line-ending checks, then compare content while ignoring comments or whitespace to confirm that code stayed unchanged. For public-header work, also compile the smallest relevant target and report the exact validation scope.
 
 ## External Material Boundary
 

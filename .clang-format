@@ -1,0 +1,40 @@
+---
+Language: Cpp
+BasedOnStyle: Microsoft
+
+# Indentation and line width.
+IndentWidth: 4
+ContinuationIndentWidth: 4
+TabWidth: 4
+UseTab: Never
+ColumnLimit: 120
+LineEnding: LF
+
+# Huli uses Allman braces and indents namespace contents.
+BreakBeforeBraces: Allman
+NamespaceIndentation: All
+AccessModifierOffset: -4
+
+# Keep C++ pointer and reference symbols next to the type.
+PointerAlignment: Left
+ReferenceAlignment: Pointer
+
+# Keep short declarations on one line. Once wrapped, place one parameter per
+# line and align continuation lines with the opening parenthesis.
+AlignAfterOpenBracket: Align
+BinPackParameters: false
+BinPackArguments: false
+AllowAllParametersOfDeclarationOnNextLine: false
+
+# Keep constructor initializer lists readable when they wrap.
+PackConstructorInitializers: Never
+
+# Preserve compact inline accessors and avoid unrelated include reordering.
+AllowShortFunctionsOnASingleLine: Inline
+SortIncludes: Never
+IncludeBlocks: Preserve
+
+EmptyLineBeforeAccessModifier: Never
+EmptyLineAfterAccessModifier: Never
+SpacesBeforeTrailingComments: 2
+...
