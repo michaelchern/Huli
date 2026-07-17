@@ -1,5 +1,5 @@
 # Huli Agent Entry
-<!-- AGENTS_ZH_CN_SHA256: 93389e622d4bc9c7cbdcfaf163dd45592fac88cf2f4188c964991e8db133687d -->
+<!-- AGENTS_ZH_CN_SHA256: 81df107a09721dabcc887bcff329d90d581938d43f7e2330c610105ce58c21b1 -->
 
 > `AGENTS.zh-CN.md` is the Chinese source for the root AI entry.
 > Other Chinese sources live in `docs/agents/zh-CN/`, `docs/tasks/zh-CN/`, and `.agents/skills/*/SKILL.zh-CN.md`.
@@ -7,7 +7,7 @@
 
 ## 1. Core Rules
 
-Huli is a C++20 / Vulkan learning repository. Its root CMake project builds Vulkan and graphics dependencies, the `huli_vulkan` static library from `src/vulkan`, the header-only `huli_render` target from `src/render`, and the Windows `huli_example1` application. Successful application compilation and linking do not prove that the Vulkan runtime smoke passes; run it separately and report the first validation error.
+Huli is a C++20 / Vulkan learning repository. Its root CMake project builds Vulkan and graphics dependencies, the `huli_vulkan` static library from `src/vulkan`, the header-only `huli_render` target from `src/render`, and the `huli_example1` application on non-Android desktop platforms. Windows and macOS currently have validated build entrypoints. Successful application compilation and linking do not prove that the Vulkan runtime smoke passes; run it separately and report the first validation error.
 
 When working in this repository:
 
@@ -39,7 +39,7 @@ These skills are plain Markdown and vendor-neutral; they are not Codex-specific.
 
 ## 3. Key Paths
 
-- `CMakeLists.txt`: root build entrypoint and live authority for dependency versions; it currently builds dependencies, `huli_vulkan`, `huli_render`, and the Windows `huli_example1` target.
+- `CMakeLists.txt`: root build entrypoint and live authority for dependency versions; it currently builds dependencies, `huli_vulkan`, `huli_render`, and `huli_example1` on non-Android desktop platforms.
 - `docs/agents/`: on-demand AI context packs.
 - `docs/tasks/`: short task checklists, topic study state, reproduction steps, and validation recipes.
 - `.agents/skills/`: shared project agent skills.
@@ -54,7 +54,7 @@ After changing agent docs or skills, check sync:
 git diff --check
 ```
 
-For C++, CMake, shader, or example changes, run the smallest relevant validation. The root project can validate dependencies and compile/link `huli_vulkan` plus the Windows `huli_example1`; a successful complete build still does not prove that the Vulkan runtime smoke passes. Report the exact validation scope.
+For C++, CMake, shader, or example changes, run the smallest relevant validation. The root project can validate dependencies and compile/link `huli_vulkan` plus desktop `huli_example1`; Windows and macOS use separate presets. A successful complete build still does not prove that the Vulkan runtime smoke passes. Report the exact validation scope.
 
 Docs-only changes usually do not require a CMake build.
 
@@ -97,6 +97,18 @@ Distill durable Huli learning context from this or recent AI conversations into 
 - After changing a Chinese source, sync the matching English file and update the SHA256 marker.
 - If nothing is certain or valuable enough to preserve, do not edit files; report candidates and why they were not preserved.
 - Run `.\tools\sync-agents.ps1 -Check` and report the result.
+
+### `=br <purpose>`
+
+Create and switch to a local branch that follows the Huli convention for the stated purpose.
+
+- Use `<type>/<english-kebab-description>` without tool, user, or date prefixes.
+- Inspect the current branch, worktree state, and known local/remote refs first; derive the name from the purpose and validate it with `git check-ref-format --branch`.
+- Create from the current `HEAD` by default; use `main` or another start point only when the user explicitly requests it.
+- Preserve uncommitted changes; do not stash, reset, or revert them.
+- If the name already exists, stop and ask; do not append a number or switch to the existing branch automatically.
+- Only create and switch branches; do not commit, push, or create a PR.
+- If the user only asks for a name or suggestion, return the suggestion without modifying the repository.
 
 ### `=gc`
 

@@ -1,8 +1,8 @@
 ---
 name: huli-workflow
-description: Vendor-neutral workflow for AI agents working in the Huli C++ Vulkan learning repository. Use when an agent edits this repo, handles =sa/=ca/=ai/=gc/=cm/=gh commands, or needs routing to build, GitHub, formatting, Vulkan, or learning context.
+description: Vendor-neutral workflow for AI agents working in the Huli C++ Vulkan learning repository. Use when an agent edits this repo, handles =sa/=ca/=ai/=br/=gc/=cm/=gh commands, or needs routing to branches, builds, GitHub, formatting, Vulkan, or learning context.
 ---
-<!-- HULI_WORKFLOW_SKILL_ZH_CN_SHA256: 6476b2cf435fce8db36040e385a698db9a449ad60c0e9626b293c4c560edf99d -->
+<!-- HULI_WORKFLOW_SKILL_ZH_CN_SHA256: 312b67d15f3c5029d85d96e3fe1e0ac15f35a24ce3f2d418b40c8bbe5b7aaec3 -->
 
 # Huli Workflow
 
@@ -21,6 +21,7 @@ This skill is plain Markdown so Codex, Claude, Cursor, Gemini CLI, or other agen
 - `=sa`: sync all English agent files from Chinese sources.
 - `=ca`: check whether all English agent files are synchronized with Chinese sources.
 - `=ai`: distill durable Huli learning context from recent AI conversations into project AI materials.
+- `=br <purpose>`: create and switch to a conventionally named local branch for the stated purpose.
 - `=gc`: run GitHub publication precheck only.
 - `=cm`: commit intended changes to the current local branch only.
 - `=gh`: commit intended changes and publish them to a GitHub PR.
@@ -42,7 +43,15 @@ For `=ai`:
 7. Confirm evidence before writing: explicit user preferences, current code, reliable external sources, verified commands, or settled designs.
 8. After changing a Chinese source, sync the English AI-facing file and run `tools/sync-agents.ps1 -Check`.
 
-For `=gc`, `=cm`, and `=gh`, read `docs/agents/git.md` before acting.
+For `=br`, or when the user explicitly asks to create a branch in natural language:
+
+1. Read `docs/agents/git.md` and derive a `<type>/<english-kebab-description>` name from the purpose.
+2. If the user only asks for a name or suggestion, return the name without modifying the repository; create and switch only on an explicit creation request.
+3. Inspect the worktree and known refs, then validate the name. If the ref already exists, stop and ask instead of appending a suffix or switching automatically.
+4. Create from the current `HEAD` by default and preserve uncommitted changes; do not stash, reset, clean, or revert them.
+5. Only create and switch branches; do not commit, push, or create a PR.
+
+For `=gc`, `=cm`, and `=gh`, also read `docs/agents/git.md` before acting.
 
 ## Context Routing
 
