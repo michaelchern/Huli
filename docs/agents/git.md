@@ -1,7 +1,47 @@
 # Huli Git Workflow Context
-<!-- AGENT_DOCS_GIT_ZH_CN_SHA256: a67ee4ae7e7ea7b1c6b43f74b969a3534fbd0752abd061b42150b189e840d860 -->
+<!-- AGENT_DOCS_GIT_ZH_CN_SHA256: 750a6e3df5e3cc278a4db9812b8f32d35b61600b668583d869a8db2464e2074e -->
 
-Load this file only for `=gc`, `=cm`, `=gh`, commits, pushes, PRs, or publication checks.
+Load this file only for `=br`, `=gc`, `=cm`, `=gh`, branches, commits, pushes, PRs, or publication checks.
+
+## Branch Naming Convention
+
+Use `<type>/<english-kebab-description>` for every branch. Keep names vendor-neutral: do not add `codex/`, user names, or date prefixes.
+
+Allowed `type` values:
+
+- `feat`: new features, example capabilities, or observable behavior.
+- `fix`: bug fixes, runtime errors, validation errors, or incorrect behavior.
+- `docs`: documentation, agent material, or learning-record changes only.
+- `refactor`: structural changes with no external behavior change.
+- `perf`: performance or resource-usage improvements.
+- `test`: tests, validation scripts, or test data.
+- `build`: CMake, dependencies, toolchains, presets, or build environments.
+- `style`: formatting, source comments, or other non-logic style changes only.
+- `chore`: repository maintenance not covered by another type.
+- `spike`: temporary learning experiments, technical validation, or prototypes.
+
+Derive `description` from the purpose as concise English. It may contain only lowercase letters, digits, and single hyphens; it must not start or end with a hyphen or contain consecutive hyphens. The complete branch name must be at most 63 characters and pass `git check-ref-format --branch`. Do not use status, duplicate, or non-standard types such as `wip`, `add`, or `hotfix`; name the actual purpose instead.
+
+Examples:
+
+- `feat/vulkan-descriptor-pool`
+- `fix/swapchain-resize`
+- `build/macos-vulkan-env`
+- `docs/branch-naming`
+- `spike/descriptor-indexing`
+
+## `=br <purpose>` Branch Creation
+
+`=br <purpose>` or an explicit natural-language request to create a branch creates and switches branches. If the user only asks for a name or suggestion, return the suggestion without modifying the repository.
+
+1. Run `git status --short --branch`; record the current branch, current `HEAD`, and uncommitted changes.
+2. Inspect local branches and currently known remote refs; do not fetch automatically just to check a name.
+3. Select the best matching `type` and turn the Chinese or natural-language purpose into concise English kebab-case.
+4. Check characters, length, and `git check-ref-format --branch`.
+5. If the same local or remote ref already exists, stop and ask the user. Do not append `-2`, a date, or another suffix, and do not switch to the existing branch automatically.
+6. Use the current `HEAD` as the default start point. Use `main`, a commit, or another branch only when the user explicitly specifies it.
+7. Create and switch with `git switch -c <branch> [<start-point>]`. Carry uncommitted changes into the new branch unchanged; do not stash, reset, clean, or revert them.
+8. Report the previous branch, new branch, start point, and whether uncommitted changes were carried. Do not commit, push, or create a PR.
 
 ## `=gc` Check
 

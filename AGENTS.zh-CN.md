@@ -6,7 +6,7 @@
 
 ## 1. 核心原则
 
-Huli 是一个 C++20 / Vulkan 学习仓库。根 CMake 已接入 Vulkan/图形第三方依赖、`src/vulkan` 的 `huli_vulkan` 静态库、`src/render` 的 `huli_render` 头文件目标，以及 Windows 下的 `huli_example1` 应用目标。应用编译链接成功不等于 Vulkan 运行验证通过；必须单独执行 runtime smoke 并报告首个验证错误。
+Huli 是一个 C++20 / Vulkan 学习仓库。根 CMake 已接入 Vulkan/图形第三方依赖、`src/vulkan` 的 `huli_vulkan` 静态库、`src/render` 的 `huli_render` 头文件目标，以及非 Android 桌面平台的 `huli_example1` 应用目标；当前 Windows 与 macOS 都有已验证构建入口。应用编译链接成功不等于 Vulkan 运行验证通过；必须单独执行 runtime smoke 并报告首个验证错误。
 
 AI 在本仓库工作时必须：
 
@@ -38,7 +38,7 @@ AI 在本仓库工作时必须：
 
 ## 3. 关键目录
 
-- `CMakeLists.txt`：根构建入口和实时依赖版本权威；当前可构建依赖目标、`huli_vulkan`、`huli_render`，并在 Windows 下构建 `huli_example1`。
+- `CMakeLists.txt`：根构建入口和实时依赖版本权威；当前可构建依赖目标、`huli_vulkan`、`huli_render`，并在非 Android 桌面平台构建 `huli_example1`。
 - `docs/agents/`：按需加载的 AI 上下文包。
 - `docs/tasks/`：短小任务清单、主题学习状态、复现步骤和验证配方。
 - `.agents/skills/`：项目共享 Agent skill。
@@ -53,7 +53,7 @@ AI 在本仓库工作时必须：
 git diff --check
 ```
 
-C++ / CMake / shader / 示例改动按需运行最小相关验证。当前根 CMake 可以验证第三方依赖、`huli_vulkan` 与 Windows `huli_example1` 的编译链接；完整构建成功仍不等于 Vulkan runtime smoke 通过，汇报时必须明确实际验证范围。
+C++ / CMake / shader / 示例改动按需运行最小相关验证。当前根 CMake 可以验证第三方依赖、`huli_vulkan` 与桌面 `huli_example1` 的编译链接；Windows 与 macOS 使用独立 preset。完整构建成功仍不等于 Vulkan runtime smoke 通过，汇报时必须明确实际验证范围。
 
 纯文档改动通常不需要 CMake 构建。
 
@@ -96,6 +96,18 @@ C++ / CMake / shader / 示例改动按需运行最小相关验证。当前根 CM
 - 修改中文源后，同步对应英文文件并更新 SHA256 marker。
 - 如果没有足够确定、值得写入的内容，不要改文件，只汇报候选项和不沉淀的理由。
 - 完成后运行 `.\tools\sync-agents.ps1 -Check` 并汇报结果。
+
+### `=br <用途>`
+
+根据用户说明的用途创建并切换到符合 Huli 规范的本地分支。
+
+- 分支名使用 `<type>/<english-kebab-description>`，不添加工具名、用户名或日期前缀。
+- 先检查当前分支、工作区状态和已有本地/远程引用，再根据用途推导名称并用 `git check-ref-format --branch` 验证。
+- 默认从当前 `HEAD` 创建；只有用户明确指定时才改用 `main` 或其他基点。
+- 保留未提交改动，不要 stash、reset 或回滚。
+- 如果名称已存在，停止并询问；不要自动追加编号或切换已有分支。
+- 只创建并切换分支，不要提交、推送或创建 PR。
+- 用户只要求“起名”或“建议分支名”时，只返回建议，不修改仓库。
 
 ### `=gc`
 

@@ -2,7 +2,7 @@
 
 ## 当前事实
 
-- 根 `CMakeLists.txt` 可以配置并构建第三方依赖、`src/vulkan` 的 `huli_vulkan`、`src/render` 的 `huli_render`，以及 Windows 下的 `huli_example1`。
+- 根 `CMakeLists.txt` 可以配置并构建第三方依赖、`src/vulkan` 的 `huli_vulkan`、`src/render` 的 `huli_render`，以及非 Android 桌面平台的 `huli_example1`；Windows 与 macOS 有已验证 preset。
 - `huli_example1` 编译链接成功不等于 Vulkan runtime smoke 通过；必须在 Vulkan validation layer 已启用时单独检查应用启动、验证层输出和持续运行状态。禁用验证层的运行不能证明 Vulkan 使用正确。
 - 当前依赖版本与条件以实时 `CMakeLists.txt` 为准；本文件只保存验证入口和带日期的证据。
 
@@ -35,6 +35,18 @@
 - `Common.hpp` 恢复为无外层 `NOMINMAX` 防重复检查的写法后，应用仍能编译链接，但会报告 `C4005: NOMINMAX` 宏重定义；这不是 runtime 退出原因，也不应被当作干净构建。
 - 在 `validationLayers` 包含 `VK_LAYER_KHRONOS_validation` 的状态下启动 Debug `huli_example1.exe`，程序完成 Vulkan instance、物理设备、surface 与逻辑设备创建路径的前置输出，但验证层首先报告 `VUID-VkDeviceCreateInfo-enabledLayerCount-12384`：当前 `VkDeviceCreateInfo` 仍把 instance validation layers 传给 device layers。
 - `debugMessengerCallback` 收到 error severity 后调用 `__debugbreak()`；5 秒存活检查确认进程以 `0x80000003` 退出。因此本快照只证明应用可编译、链接并进入 Vulkan 初始化，不证明可持续运行或 runtime 验证通过。
+
+## 2026-07-17 macOS、VS Code 与 Runtime 快照
+
+- 验证环境为 Apple Silicon macOS 26.5.2 / Apple M5、CMake 4.3.3、Ninja 1.13.2、Apple Clang 21.0.0 和 Vulkan SDK 1.4.350.0；`out/build/ninja-macos/CMakeCache.txt` 记录 Ninja Multi-Config、`/usr/bin/c++`、`/usr/local/include` 与 `/usr/local/lib/libvulkan.dylib`。
+- `CMakePresets.json` 新增 `ninja-macos` 与 `macos-debug` / `macos-release` / `macos-relwithdebinfo`，VS Code 通过 CMake Tools、clangd 与 CodeLLDB 使用同一 preset 和 launch target。
+- `Context` 改为通过平台无关的 `SurfaceFactory` 创建 surface；`huli_example1` 使用 GLFW 报告的 instance extensions 和 `glfwCreateWindowSurface()`。macOS 额外启用 portability enumeration 和 portability subset，不再依赖 Win32 native window API。
+- glslang 源码编译路径已从 Windows-only 改为桌面通用；Debug/Release 使用标准 `NDEBUG` 条件。简单三角形示例不再请求未使用的 descriptor-indexing 默认功能。
+- 两条 `VkDeviceCreateInfo` 路径不再传递 device layers，2026-07-14 首先出现的 `VUID-VkDeviceCreateInfo-enabledLayerCount-12384` 已消除。Debug messenger 也不再声明未启用的 device-address-binding message type，默认 core validation 不再强制启用 GPU-assisted validation。
+- 交换链使用实际 framebuffer/current extent，在 Retina 屏幕创建 1600×1200、3 图像 swapchain；acquire semaphore 按 frame slot 分配，render-finished semaphore 按 swapchain image 分配，避免跨帧复用仍有 pending operation 的二进制信号量。
+- `cmake --preset ninja-macos` 配置成功；Debug `huli_vulkan`、Debug/Release `huli_example1` 与 Debug 完整构建均退出 `0`，未修改输入时第二次 Debug 完整构建返回 `ninja: no work to do.`。
+- 在 `VK_LAYER_KHRONOS_validation` 启用时启动 Debug 应用，MoltenVK 选择 Apple M5、启用 `VK_KHR_portability_subset` 与 `VK_KHR_swapchain`，窗口持续运行约 10 秒并稳定输出约 60 FPS；期间没有 error VUID、SIGTRAP、shader module 错误或提前退出。测试进程由验证工具主动终止，未自动验证 Escape 按键路径。
+- validation layer 首次读取不存在的 shader validation cache 会输出 warning；它不是 VUID，也没有中断运行。
 
 ## 全新构建检查
 
@@ -69,6 +81,21 @@ cmake --build --preset clang-debug --parallel 8
 
 配置日志必须识别 `Clang`，缓存中的 C/C++ 编译器必须是 `clang` / `clang++`，不能复用 `out/build/ninja-msvc`。
 
+macOS 使用独立 preset：
+
+```bash
+git status --short --branch
+cmake --list-presets
+cmake --preset ninja-macos
+cmake --build --preset macos-debug --target huli_vulkan --parallel 8
+cmake --build --preset macos-debug --target huli_example1 --parallel 8
+cmake --build --preset macos-debug --parallel 8
+cmake --build --preset macos-debug --parallel 8
+out/build/ninja-macos/examples/example1/Debug/huli_example1
+```
+
+macOS runtime 验收要求 Debug validation layer 已启用、MoltenVK 能枚举 Apple GPU、swapchain 使用实际 framebuffer extent，并且应用持续运行时没有 error VUID 或 SIGTRAP。
+
 ## Visual Studio 检查
 
 1. 确认 Visual Studio 使用 `CMakePresets.json`，并能看到 `ninja-msvc`、`ninja-clang`、`ninja-msvc-asan`、`ninja-msvc-tracy`。
@@ -83,6 +110,14 @@ cmake --build --list-presets
 rg -n "^(CMAKE_GENERATOR|CMAKE_CONFIGURATION_TYPES|CMAKE_CXX_COMPILER|Vulkan_INCLUDE_DIR|Vulkan_LIBRARY):" `
   out/build/ninja-msvc/CMakeCache.txt
 ```
+
+## macOS VS Code 检查
+
+1. 用 VS Code 打开仓库根目录，安装仓库推荐的 CMake Tools、clangd 与 CodeLLDB。
+2. 执行 `CMake: Select Configure Preset` 并选择 `ninja-macos`，然后执行 `CMake: Configure`。
+3. 将 launch target 设为 `huli_example1`，使用 `macos-debug` 构建。
+4. 选择 `Debug huli_example1` 并按 F5；launch 配置通过 `${command:cmake.launchTargetPath}` 使用当前 CMake 目标。
+5. 确认根目录生成的 `compile_commands.json` 处于 Git 忽略状态，并由 clangd 使用。
 
 ## 专项 preset 检查
 
