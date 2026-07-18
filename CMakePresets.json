@@ -1,5 +1,4 @@
 {
-  "$schema": "https://raw.githubusercontent.com/Kitware/CMake/master/Help/manual/presets/schema.json",
   "version": 8,
   "cmakeMinimumRequired": {
     "major": 3,
@@ -13,9 +12,9 @@
       "installDir": "${sourceDir}/out/install/${presetName}",
       "cacheVariables": {
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-        "BUILD_TESTING": "OFF",
-        "GLI_TEST_ENABLE": "OFF",
-        "IMGUI_EXAMPLES": "OFF",
+        "BUILD_TESTING": null,
+        "GLI_TEST_ENABLE": null,
+        "IMGUI_EXAMPLES": null,
         "TRACY_ENABLE": "OFF",
         "TRACY_CALLSTACK": "OFF"
       }

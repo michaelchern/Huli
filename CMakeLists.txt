@@ -19,9 +19,10 @@ endif()
 find_package(Vulkan REQUIRED COMPONENTS SPIRV-Tools)
 include(FetchContent)
 
-# glslang：把 GLSL/HLSL 着色器源码编译为 SPIR-V。
+# glslang：把 GLSL 着色器源码编译为 SPIR-V。
 # 该组件与已安装的 Vulkan SDK 保持一致，避免头文件与库版本不匹配。
 if (Vulkan_VERSION VERSION_GREATER_EQUAL "1.4.350")
+  set(ENABLE_HLSL OFF CACHE BOOL "关闭未使用的 HLSL 前端" FORCE)
   set(ENABLE_OPT OFF CACHE BOOL "关闭 glslang 优化器集成" FORCE)
   FetchContent_Declare(
     glslang
@@ -36,9 +37,9 @@ else()
   set(GLSLANG_LIB glslang)
 endif()
 
-include_directories(${Vulkan_INCLUDE_DIR})
+#include_directories(${Vulkan_INCLUDE_DIR})
 message(STATUS "Vulkan_INCLUDE_DIR: ${Vulkan_INCLUDE_DIR}")
-link_directories(${Vulkan_INCLUDE_DIR}/../lib)
+#link_directories(${Vulkan_INCLUDE_DIR}/../lib)
 
 # SPIRV-Reflect：读取 SPIR-V 字节码中的描述符绑定、着色器阶段和推送常量布局等元数据。
 # 该组件与固定的 Vulkan SDK 版本保持一致。
@@ -257,31 +258,24 @@ set(DLSS_DLL "${dlss_SOURCE_DIR}/lib/Windows_x86_64/rel/nvngx_dlss.dll")
 link_directories(${dlss_SOURCE_DIR}/lib/Windows_x86_64/x86_64/)
 ]]
 
-#[[ 以下目录对应当前已注释的依赖，恢复依赖时再一并恢复。
-include_directories(${stb_SOURCE_DIR})
-]]
-include_directories(${volk_SOURCE_DIR})
-include_directories(${glm_SOURCE_DIR})
-#[[
-include_directories(${gli_SOURCE_DIR})
-include_directories(${spirvcross_SOURCE_DIR})
-]]
-include_directories(${spirvreflect_SOURCE_DIR})
-#[[
-include_directories(${gltfsdk_SOURCE_DIR}/GLTFSDK/Inc)
-if (NOT ANDROID)
-  include_directories(${glfw_SOURCE_DIR}/include)
-  include_directories(${imgui_SOURCE_DIR})
-endif()
-]]
-include_directories(${tracy_SOURCE_DIR}/public)
-#[[
-include_directories(${threadpool_SOURCE_DIR}/include)
-include_directories(${meshopt_SOURCE_DIR}/src)
-include_directories(${freetype_SOURCE_DIR}/include)
-include_directories(${font-demo_SOURCE_DIR})
-include_directories(${dlss_SOURCE_DIR}/include)
-]]
+# 第三方头文件路径由各依赖的 CMake target 传播，不要恢复全局 include_directories。
+#include_directories(${stb_SOURCE_DIR})
+#include_directories(${volk_SOURCE_DIR})
+#include_directories(${glm_SOURCE_DIR})
+#include_directories(${gli_SOURCE_DIR})
+#include_directories(${spirvcross_SOURCE_DIR})
+#include_directories(${spirvreflect_SOURCE_DIR})
+#include_directories(${gltfsdk_SOURCE_DIR}/GLTFSDK/Inc)
+#if (NOT ANDROID)
+#  include_directories(${glfw_SOURCE_DIR}/include)
+#  include_directories(${imgui_SOURCE_DIR})
+#endif()
+#include_directories(${tracy_SOURCE_DIR}/public)
+#include_directories(${threadpool_SOURCE_DIR}/include)
+#include_directories(${meshopt_SOURCE_DIR}/src)
+#include_directories(${freetype_SOURCE_DIR}/include)
+#include_directories(${font-demo_SOURCE_DIR})
+#include_directories(${dlss_SOURCE_DIR}/include)
 
 #[[ 当前没有目标使用 RequiredVulkanSDKLIBS，且其中的 SPIRV-Cross 尚未声明获取来源。
 set(RequiredVulkanSDKLIBS 
