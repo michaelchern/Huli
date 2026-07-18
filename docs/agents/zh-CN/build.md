@@ -44,6 +44,7 @@ VULKAN_SDK=C:\VulkanSDK\1.4.350.0
 - Windows 目标若可能在 `windows.h` 之后解析 `std::min` / `std::max`，应通过目标级 compile definition 在预处理开始前提供 `NOMINMAX`；不要依赖较晚的头文件定义或 include 顺序。头文件若保留本地兜底定义，必须先检查 `NOMINMAX` 是否已经存在，避免 `C4005`。
 - 本机路径、个人环境覆盖或实验配置写入已忽略的 `CMakeUserPresets.json`；`VULKAN_SDK` 继续由启动 Visual Studio 或终端的环境提供。
 - VS Code 必须打开仓库根目录并使用 CMake Tools 选择 preset 和 `huli_example1` launch target。仓库内 `.vscode/launch.json` 通过 CodeLLDB 启动 `${command:cmake.launchTargetPath}`，不会固定可执行文件绝对路径。
+- `.vscode/settings.json` 通过 `cmake.copyCompileCommands` 把当前 configure preset 的编译数据库复制到已忽略的根目录 `compile_commands.json`，供 clangd 从源码父目录发现；重新配置后应确认该文件存在且来自当前构建树。
 - 修改或新增 preset 后，至少运行 `cmake --list-presets`、确认构建目录相互隔离，并检查实际 `CMakeCache.txt` 使用了预期生成器、编译器和 Vulkan SDK。
 
 ## 命令行配置与构建
@@ -98,6 +99,7 @@ ASan preset 通过 `CFLAGS` / `CXXFLAGS` 添加 `/fsanitize=address`，并使用
 - DLSS 仓库包含大文件和子模块，首次下载可能长时间无新日志；先检查下载进程再判断是否卡死。
 - MSVC `C4819` 后紧跟类声明、预处理指令等连带语法错误时，先检查真实编译命令是否包含 `/utf-8`；不要从后续错误行反推代码损坏。
 - `std::min` / `std::max` 附近的 `C2589` 常见于 Windows `min` / `max` 宏展开，检查 `NOMINMAX` 是否从编译开始生效；`C4005: NOMINMAX` 则表示命令行定义与头文件兜底重复且未加保护。
+- clangd 把 C++17 及之后的合法语法报告为 extension 时，先检查根目录 `compile_commands.json` 是否存在、是否包含目标的 `-std=c++20` 或 `/std:c++20`，再重启 clangd；不要通过改写合法源码来掩盖语言服务器使用了回退标准。
 - 排错时先找第一条 `CMake Error`、`fatal:`、`FAILED:` 或 MSVC `error Cxxxx`，不要从最后的退出代码反推原因。
 
 ## 修改与验证规则
