@@ -83,6 +83,19 @@
         "TRACY_ENABLE": "ON",
         "TRACY_CALLSTACK": "ON"
       }
+    },
+    {
+      "name": "ninja-macos",
+      "displayName": "Ninja macOS",
+      "description": "macOS - Ninja Multi-Config + Apple Clang",
+      "inherits": "base",
+      "generator": "Ninja Multi-Config",
+      "binaryDir": "${sourceDir}/out/build/ninja-macos",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
+      }
     }
   ],
   "buildPresets": [
@@ -140,6 +153,27 @@
       "displayName": "MSVC Tracy Release",
       "configurePreset": "ninja-msvc-tracy",
       "configuration": "Release",
+      "verbose": true
+    },
+    {
+      "name": "macos-debug",
+      "displayName": "macOS Debug",
+      "configurePreset": "ninja-macos",
+      "configuration": "Debug",
+      "verbose": true
+    },
+    {
+      "name": "macos-release",
+      "displayName": "macOS Release",
+      "configurePreset": "ninja-macos",
+      "configuration": "Release",
+      "verbose": true
+    },
+    {
+      "name": "macos-relwithdebinfo",
+      "displayName": "macOS RelWithDebInfo",
+      "configurePreset": "ninja-macos",
+      "configuration": "RelWithDebInfo",
       "verbose": true
     }
   ]
