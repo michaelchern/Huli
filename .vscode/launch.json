@@ -1,13 +1,12 @@
 {
-  "version": "0.2.0",
   "configurations": [
     {
       "type": "lldb",
       "request": "launch",
-      "name": "Debug huli_example1",
+      "name": "Launch",
       "program": "${command:cmake.launchTargetPath}",
       "args": [],
-      "cwd": "${workspaceFolder}"
+      "cwd": "${command:cmake.buildDirectory}"
     }
   ]
 }
