@@ -117,7 +117,8 @@ rg -n "^(CMAKE_GENERATOR|CMAKE_CONFIGURATION_TYPES|CMAKE_CXX_COMPILER|Vulkan_INC
 2. 执行 `CMake: Select Configure Preset` 并选择 `ninja-macos`，然后执行 `CMake: Configure`。
 3. 将 launch target 设为 `huli_example1`，使用 `macos-debug` 构建。
 4. 选择 `Debug huli_example1` 并按 F5；launch 配置通过 `${command:cmake.launchTargetPath}` 使用当前 CMake 目标。
-5. 确认根目录生成的 `compile_commands.json` 处于 Git 忽略状态，并由 clangd 使用。
+5. 确认 `.vscode/settings.json` 的 `cmake.copyCompileCommands` 把当前 preset 的编译数据库复制到根目录 `compile_commands.json`，且该文件处于 Git 忽略状态。
+6. 头文件若被 clangd 误报为使用旧语言标准，确认对应真实编译命令包含 `-std=c++20`，然后执行 `clangd: Restart language server`；不要为了清除误报改写合法的 C++20 源码。
 
 ## 专项 preset 检查
 

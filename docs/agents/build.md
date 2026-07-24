@@ -1,5 +1,5 @@
 # Huli Build Context
-<!-- AGENT_DOCS_BUILD_ZH_CN_SHA256: e4792e797171f4549af829f9fad7cbbea594233b6bcf23e866fbddd4041e5a6f -->
+<!-- AGENT_DOCS_BUILD_ZH_CN_SHA256: b15039722911057a67b83011fa8754f011988d46a39ab709f42cb89b2af14c51 -->
 
 Load this file only for CMake, build, Visual Studio, validation-command, or compiler-error work.
 
@@ -45,6 +45,7 @@ VULKAN_SDK=C:\VulkanSDK\1.4.350.0
 - Windows targets that may parse `std::min` or `std::max` after `windows.h` must provide `NOMINMAX` as a target-scoped compile definition before preprocessing starts. Do not rely on a later header definition or include order. If a header keeps a fallback definition, guard it against an existing `NOMINMAX` to avoid `C4005`.
 - Put machine paths, personal environment overrides, and experimental configurations in the ignored `CMakeUserPresets.json`. `VULKAN_SDK` continues to come from the environment that launches Visual Studio or the terminal.
 - VS Code must open the repository root and use CMake Tools to select the preset and `huli_example1` launch target. The repository `.vscode/launch.json` delegates to CodeLLDB through `${command:cmake.launchTargetPath}` instead of fixing an executable path.
+- `.vscode/settings.json` uses `cmake.copyCompileCommands` to copy the active configure preset's compilation database to the Git-ignored root `compile_commands.json`, where clangd can discover it by walking source ancestors. After configuring, confirm that this file exists and comes from the active build tree.
 - After changing or adding a preset, run `cmake --list-presets`, confirm build directories are isolated, and inspect the resulting `CMakeCache.txt` for the intended generator, compiler, and Vulkan SDK.
 
 ## Command-Line Configure and Build
@@ -99,6 +100,7 @@ The ASan preset adds `/fsanitize=address` through `CFLAGS` / `CXXFLAGS` and uses
 - The DLSS repository contains large files and submodules. Inspect active download processes before declaring a quiet first download stuck.
 - If MSVC reports `C4819` followed by cascading syntax errors near class declarations or preprocessor directives, first verify that the real compile command contains `/utf-8`; do not infer source corruption from the later line.
 - `C2589` near `std::min` or `std::max` commonly means the Windows `min` or `max` macro expanded; verify that `NOMINMAX` is active from compile start. `C4005: NOMINMAX` means a command-line definition and an unguarded header fallback overlap.
+- If clangd reports valid C++17-or-later syntax as an extension, first check that the root `compile_commands.json` exists and that the real target command contains `-std=c++20` or `/std:c++20`, then restart clangd. Do not rewrite valid source merely to hide fallback-standard parsing.
 - Diagnose the first `CMake Error`, `fatal:`, `FAILED:`, or MSVC `error Cxxxx`, rather than reasoning backward from the final exit code.
 
 ## Change and Validation Rules

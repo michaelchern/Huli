@@ -1,5 +1,5 @@
 # Huli Build Smoke
-<!-- TASK_DOCS_BUILD_SMOKE_ZH_CN_SHA256: 23fda7d1447ed06294794c5d89fed9e5c38caa78a836a69e63e21c30b99ebf0a -->
+<!-- TASK_DOCS_BUILD_SMOKE_ZH_CN_SHA256: 60c012f57d2d0c77236d8bece7e4f5b6e9afcdc38a10e667073f4fbe9cb5feed -->
 
 ## Current Facts
 
@@ -118,7 +118,8 @@ rg -n "^(CMAKE_GENERATOR|CMAKE_CONFIGURATION_TYPES|CMAKE_CXX_COMPILER|Vulkan_INC
 2. Run `CMake: Select Configure Preset`, choose `ninja-macos`, and run `CMake: Configure`.
 3. Set the launch target to `huli_example1` and build with `macos-debug`.
 4. Select `Debug huli_example1` and press F5. The launch configuration uses `${command:cmake.launchTargetPath}` from the active CMake target.
-5. Confirm that the root `compile_commands.json` is Git-ignored and consumed by clangd.
+5. Confirm that `.vscode/settings.json` uses `cmake.copyCompileCommands` to copy the active preset's compilation database to the root `compile_commands.json`, and that the copied file is Git-ignored.
+6. If clangd reports a header with an older language standard, verify that its real compile command contains `-std=c++20`, then run `clangd: Restart language server`; do not rewrite valid C++20 source to silence the false diagnostic.
 
 ## Specialized Preset Check
 

@@ -40,6 +40,7 @@ target_include_directories(
 target_link_libraries(
   huli_vulkan
   PUBLIC
+    Vulkan::Headers
     volk::volk
     GPUOpen::VulkanMemoryAllocator
     glm::glm
