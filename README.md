@@ -1,10 +1,14 @@
 <div align="center">
 
 <p align="center">
-  <img src="docs/image/readme-hero.webp" alt="Huli | Vulkan Graphics Playground" width="720">
+  <img src="docs/image/readme-hero.webp" alt="Huli | Vulkan Graphics Playground">
 </p>
 
-# 🦊 Huli — Vulkan 图形编程实践
+# Huli
+
+<p align="center">
+  <a href="./README.md">🇨🇳 中文</a> | <a href="./README_EN.md">🇺🇸 English</a>
+</p>
 
 <p align="center">
   <a href="https://github.com/michaelchern/Huli/stargazers">
@@ -22,22 +26,19 @@
 </p>
 
 <p align="center">
-  <strong>深入 Vulkan 图形管线 | 从零构建现代渲染引擎</strong>
+  <strong>深入 Vulkan 图形管线 | 从零构建现代渲染器</strong>
 </p>
 
 </div>
 
 ---
 
-一个使用 C++20 探索现代 Vulkan 图形技术的个人学习与实验仓库。
-
-项目从 Vulkan 基础设施与桌面示例开始，逐步实践 GPU 驱动渲染、延迟着色、顺序无关透明、抗锯齿、光线追踪与 VR 渲染等现代图形技术。当前根 CMake 工程已接入 `huli_vulkan`、`huli_render` 和桌面示例 `huli_example1`；后续实验会随着学习进度逐步加入。
+一个使用 C++20 探索现代 Vulkan 图形技术的个人学习与实验仓库。项目从 Vulkan 基础设施与桌面示例开始，逐步实践 GPU 驱动渲染、延迟着色、顺序无关透明、抗锯齿、光线追踪与 VR 渲染等现代图形技术。
 
 - [🚀 项目目标](#项目目标)
 - [🗂️ 仓库结构](#仓库结构)
 - [💻 环境与构建](#环境与构建)
 - [📋 模块进度](#模块进度)
-- [✍️ 笔记与备忘](#笔记与备忘)
 - [📄 许可与声明](#许可与声明)
 
 ## 项目目标
@@ -60,7 +61,7 @@
 > 以下目录结构仍是规划草案，项目最终组织方式尚未确定，暂时保持不变。当前可构建目标请以根目录 `CMakeLists.txt` 和实际源码树为准。
 
 ```text
-huli/
+Huli/
 ├── modules/                  # 各个独立的实验模块
 │   ├── 01_core_framework/    # 基础框架：实例、设备、交换链、资源管理
 │   ├── 02_vertex_pulling/    # 可编程顶点拉取与间接绘制
@@ -86,8 +87,8 @@ huli/
 | 项目 | 环境 |
 | --- | --- |
 | 语言标准 | C++20 |
-| 操作系统 | Windows 11 / macOS |
-| IDE | Visual Studio 2022 Community / Visual Studio Code |
+| 操作系统 | Windows 10 / Windows 11 / MacOS |
+| IDE | Visual Studio Community / Visual Studio Code |
 | 构建工具 | CMake 3.28+、Ninja Multi-Config |
 | 编译器 | MSVC、LLVM Clang、Apple Clang |
 | Vulkan SDK | 推荐 1.4.350.0 |
@@ -101,7 +102,7 @@ huli/
 - [Ninja](https://ninja-build.org/)
 - [Vulkan SDK](https://vulkan.lunarg.com/)；推荐使用 `1.4.350.0`
 - Windows：Visual Studio 2022 的“使用 C++ 的桌面开发”工作负载，或可用的 LLVM Clang 工具链
-- macOS：Xcode Command Line Tools，以及包含 MoltenVK 的 Vulkan SDK
+- MacOS：Xcode Command Line Tools，以及包含 MoltenVK 的 Vulkan SDK
 
 首次配置时 CMake 会下载项目所需的第三方依赖，因此需要可用的网络连接。
 
@@ -126,7 +127,7 @@ cmake --build --preset msvc-debug --target huli_example1 --parallel 8
 
 如需使用 LLVM Clang，可将配置预设替换为 `ninja-clang`，并使用 `clang-debug`、`clang-release` 或 `clang-relwithdebinfo` 构建预设。
 
-### macOS
+### MacOS
 
 ```bash
 cmake --preset ninja-macos
@@ -149,16 +150,16 @@ cmake --list-presets=all
 
 下表是学习路线规划，并不表示所有模块都已接入当前根 CMake 工程；实际可构建内容请以源码和 `CMakeLists.txt` 为准。
 
-| 模块 | 内容 | 状态 | 可运行 | 笔记 |
-| :---: | --- | :---: | :---: | :---: |
-| 01 | 核心框架 | ✅ | ✅ | ✅ |
-| 02 | 可编程顶点拉取 | 🚧 | 🚧 | 🚧 |
-| 03 | GPU 驱动渲染 | ⬜ | ⬜ | ⬜ |
-| 04 | 延迟渲染 | ⬜ | ⬜ | ⬜ |
-| 05 | 顺序无关透明 | ⬜ | ⬜ | ⬜ |
-| 06 | 抗锯齿实验 | ⬜ | ⬜ | ⬜ |
-| 07 | 光线追踪 | ⬜ | ⬜ | ⬜ |
-| 08 | OpenXR 与 VR | ⬜ | ⬜ | ⬜ |
+| 模块 | 内容 | 状态 | 可运行 |
+| :---: | --- | :---: | :---: |
+| 01 | 核心框架 | ✅ | ✅ |
+| 02 | 可编程顶点拉取 | 🚧 | 🚧 |
+| 03 | GPU 驱动渲染 | ⬜ | ⬜ |
+| 04 | 延迟渲染 | ⬜ | ⬜ |
+| 05 | 顺序无关透明 | ⬜ | ⬜ |
+| 06 | 抗锯齿实验 | ⬜ | ⬜ |
+| 07 | 光线追踪 | ⬜ | ⬜ |
+| 08 | OpenXR 与 VR | ⬜ | ⬜ |
 
 > **图例**：✅ 已完成　|　🚧 进行中　|　⬜ 计划中
 
@@ -181,4 +182,4 @@ cmake --list-presets=all
 
 通过 CMake 获取的第三方依赖，以及仓库中引用的模型、纹理等社区资源，分别遵循其原始作者和项目所声明的许可条款；相关版权归各自权利人所有。
 
-欢迎探索，欢迎交流。让我们一起把 GPU 的潜力逼到极致。🔥
+欢迎探索，欢迎交流。让我们一起把 GPU 的潜力逼到极致。
