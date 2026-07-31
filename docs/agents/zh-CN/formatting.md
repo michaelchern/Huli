@@ -13,7 +13,7 @@
 - 修改 `.gitattributes` 后，用 `git check-attr` 验证代表路径，并用 `git ls-files --eol` 检查索引。只有在明确需要迁移已有换行且工作区干净时才运行 `git add --renormalize .`，并逐项审查暂存差异。
 - 不要用格式化命令重写无关文件。
 - 只格式化本次任务触碰的 C++ / shader / CMake 文件，除非用户明确要求全仓格式化。
-- Agent 文档改动后运行 `.\tools\sync-agents.ps1 -Check` 和 `git diff --check`。
+- Agent 文档改动后运行平台适用的同步检查和 `git diff --check`；macOS / Linux 使用 `python3 ./tools/sync-agents.py --check`，Windows PowerShell 使用 `.\tools\sync-agents.ps1 -Check`。
 - `git diff --check` 不覆盖未跟踪文件；发布前必须显式检查未跟踪文件，暂存后再运行 `git diff --cached --check`。
 
 ## 当前状态

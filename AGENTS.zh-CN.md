@@ -14,6 +14,7 @@ AI 在本仓库工作时必须：
 - 只加载当前任务需要的上下文，避免把 Vulkan、构建和 Git 流程一次性塞满上下文。
 - 修改前查看 `git status --short --branch`。
 - 不要回滚用户已有改动。
+- 默认采用 PR-first：代码和文档从非默认分支通过 PR 进入 `main`；不要发布验证失败的改动；未经用户明确授权，不直推 `main` 或合并 PR。
 - 以当前 `CMakeLists.txt` 和源码目录为准，不要假设尚未接入根构建的教材、实验目标或运行入口已经存在。
 - Huli 的学习产物应落在本仓库；引用外部材料时说明来源和学习目的，不要无说明地大段复制。
 - 每次实质改动都给出验证命令和结果；纯文档改动通常只需要同步检查和 diff 检查。
@@ -42,14 +43,29 @@ AI 在本仓库工作时必须：
 - `docs/agents/`：按需加载的 AI 上下文包。
 - `docs/tasks/`：短小任务清单、主题学习状态、复现步骤和验证配方。
 - `.agents/skills/`：项目共享 Agent skill。
+- `CONTRIBUTING.md`：面向贡献者的分支、提交、验证和 PR 流程入口。
+- `.github/PULL_REQUEST_TEMPLATE.md`：GitHub PR 的范围、验证、风险和回滚说明模板。
 - `tools/`：Agent 同步脚本和后续轻量工具。
 
 ## 4. 默认验证
 
 修改 Agent 文档或 skill 后，必须检查同步：
 
+macOS / Linux：
+
+```bash
+python3 ./tools/sync-agents.py --check
+```
+
+Windows PowerShell：
+
 ```powershell
 .\tools\sync-agents.ps1 -Check
+```
+
+然后检查 diff：
+
+```bash
 git diff --check
 ```
 
@@ -69,13 +85,13 @@ C++ / CMake / shader / 示例改动按需运行最小相关验证。当前根 CM
 - 同步范围包括根 `AGENTS.md`、`docs/agents/*.md`、`docs/tasks/*.md` 和项目 skills。
 - 保持章节结构一致；英文要短、直接、适合作为 AI 上下文。
 - 更新对应英文文件顶部的 sync marker。
-- 运行 `.\tools\sync-agents.ps1 -Check`。
+- 运行平台适用的同步检查：macOS / Linux 使用 `python3 ./tools/sync-agents.py --check`，Windows PowerShell 使用 `.\tools\sync-agents.ps1 -Check`。
 
 ### `=ca`
 
 检查所有英文 Agent 文件是否与中文源同步。
 
-- 只运行 `.\tools\sync-agents.ps1 -Check`。
+- 只运行一个平台适用的同步检查：macOS / Linux 使用 `python3 ./tools/sync-agents.py --check`，Windows PowerShell 使用 `.\tools\sync-agents.ps1 -Check`。
 - 不要修改文件。
 - 检查范围由实际中文源动态发现，包括缺失目标、孤立英文文档或 skill、重复 marker 和明显未翻译的中文正文。
 - 如果不同步，提示用户运行 `=sa`。
@@ -95,13 +111,14 @@ C++ / CMake / shader / 示例改动按需运行最小相关验证。当前根 CM
 - 写入前确认依据：用户明确偏好、当前代码事实、已验证命令、可靠外部来源或已落地设计；证据不足时只列候选，不写成规则。
 - 修改中文源后，同步对应英文文件并更新 SHA256 marker。
 - 如果没有足够确定、值得写入的内容，不要改文件，只汇报候选项和不沉淀的理由。
-- 完成后运行 `.\tools\sync-agents.ps1 -Check` 并汇报结果。
+- 完成后运行平台适用的同步检查并汇报结果：macOS / Linux 使用 `python3 ./tools/sync-agents.py --check`，Windows PowerShell 使用 `.\tools\sync-agents.ps1 -Check`。
 
 ### `=br <用途>`
 
 根据用户说明的用途创建并切换到符合 Huli 规范的本地分支。
 
 - 分支名使用 `<type>/<english-kebab-description>`，不添加工具名、用户名或日期前缀。
+- 分支应短生命周期且只承载一个清晰目标；`spike` 只用于本地实验，不用于发布 PR。
 - 先检查当前分支、工作区状态和已有本地/远程引用，再根据用途推导名称并用 `git check-ref-format --branch` 验证。
 - 默认从当前 `HEAD` 创建；只有用户明确指定时才改用 `main` 或其他基点。
 - 保留未提交改动，不要 stash、reset 或回滚。
@@ -114,8 +131,10 @@ C++ / CMake / shader / 示例改动按需运行最小相关验证。当前根 CM
 检查当前改动是否可以发布到 GitHub。
 
 - 查看 `git status --short --branch`。
-- 检查改动范围和相关 diff。
-- 运行相关验证。
+- 检查完整 diff、未跟踪文件和拟提交范围，确认改动只服务一个清晰目标。
+- 给出符合 `<type>(<scope>): <中文简述>` 的建议标题；scope 可省略。
+- 运行相关验证，汇报命令、结果、未执行项及原因。
+- 识别兼容性、Vulkan 生命周期/同步、运行时验证、CMake/依赖、跨平台和资源文件风险。
 - 不要暂存、提交、推送或创建 PR。
 - 如果准备好本地提交，提示用户可以运行 `=cm`。
 - 如果用户明确需要 GitHub PR，再提示可以运行 `=gh`。
@@ -126,7 +145,9 @@ C++ / CMake / shader / 示例改动按需运行最小相关验证。当前根 CM
 
 - 先检查改动范围和验证结果。
 - 只暂存本次任务相关文件，不要默认 `git add .`。
-- commit 必须包含标题和中文正文摘要；正文说明改了什么、为什么改、验证了什么。
+- 必要验证全部通过后才能正常提交；验证失败时只能在用户明确要求下创建 `chore(wip): ...` 本地兜底提交，且该提交不得推送或创建 PR。
+- commit 标题使用 `<type>(<scope>): <中文简述>`；scope 可省略，破坏性变更在 type/scope 后使用 `!`。
+- commit 正文使用中文并明确列出“变更”“原因”“验证”；存在兼容性或运行风险时再列“风险”。
 - 不要推送、不要创建 PR、不要合并分支。
 - 汇报分支、commit 和验证结果。
 
@@ -137,8 +158,11 @@ C++ / CMake / shader / 示例改动按需运行最小相关验证。当前根 CM
 - 先检查改动范围和验证结果。
 - 只暂存本次任务相关文件，不要默认 `git add .`。
 - 如果存在未提交改动，先按 `=cm` 规则提交。
+- 当前分支必须是可发布的非默认任务分支；`main` 和 `spike/*` 不通过该命令发布。
+- PR 标题使用 `<type>(<scope>): <中文简述>`，正文按 `.github/PULL_REQUEST_TEMPLATE.md` 如实填写范围、验证、风险和回滚。
 - 推送当前分支到 `origin`。
 - 创建 GitHub draft PR。
+- 不要把 PR 转为 ready、合并 PR 或直推 `main`，除非用户另外明确授权且必要验证已通过。
 - 汇报分支、commit、PR URL 和验证结果。
 
 ## 6. 同步规则

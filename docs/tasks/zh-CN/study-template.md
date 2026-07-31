@@ -31,7 +31,9 @@
 
 ## Validation
 
-```powershell
-.\tools\sync-agents.ps1 -Check
+```bash
+python3 ./tools/sync-agents.py --check
 git diff --check
 ```
+
+Windows PowerShell 可将第一条命令替换为 `.\tools\sync-agents.ps1 -Check`。

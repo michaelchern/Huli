@@ -1,5 +1,5 @@
 # [Study Topic]
-<!-- TASK_DOCS_STUDY_TEMPLATE_ZH_CN_SHA256: cb35fb547a3374da5411bbfc3a3f3d9e9ab5e8e91ee417b1d8f02c4ae987cd50 -->
+<!-- TASK_DOCS_STUDY_TEMPLATE_ZH_CN_SHA256: 62ced6a681f50b4c735bf85305664ddf2b28a0e28043966d03c894af379fc2b2 -->
 
 ## Current Facts
 
@@ -32,7 +32,9 @@
 
 ## Validation
 
-```powershell
-.\tools\sync-agents.ps1 -Check
+```bash
+python3 ./tools/sync-agents.py --check
 git diff --check
 ```
+
+In Windows PowerShell, replace the first command with `.\tools\sync-agents.ps1 -Check`.

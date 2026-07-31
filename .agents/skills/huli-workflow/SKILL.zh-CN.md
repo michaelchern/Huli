@@ -25,7 +25,15 @@ description: Huli C++ Vulkan 学习仓库的通用 Agent 工作流。Agent 修�
 - `=cm`：只提交目标改动到当前本地分支。
 - `=gh`：提交目标改动并发布到 GitHub PR。
 
-`=sa` 和 `=ca` 使用 `tools/sync-agents.ps1`；脚本动态发现中文源配对，并检查规范化 SHA256 marker、缺失目标、孤立英文文档或 skill，以及明显未翻译正文。
+`=sa` 和 `=ca` 使用平台适用的同步检查器：macOS / Linux 使用 `python3 ./tools/sync-agents.py --check`，Windows PowerShell 使用 `.\tools\sync-agents.ps1 -Check`。两者都动态发现中文源配对，并检查规范化 SHA256 marker、缺失目标、孤立英文文档或 skill，以及明显未翻译正文。
+
+Git 交付默认遵循以下契约，细节以 `docs/agents/git.md` 为准：
+
+- 默认 PR-first，一个分支和 PR 只处理一个清晰目标；已有任务分支、worktree 和未提交改动优先保留。
+- commit 与 PR 标题使用 `<type>(<scope>): <中文简述>`，scope 可省略；commit 正文用中文写明变更、原因和验证。
+- `=gc` 必须检查完整 diff、未跟踪文件、拟提交范围、验证结果、未验证项和风险。
+- `=cm` 只暂存任务文件，并在必要验证通过后创建本地提交；验证失败的兜底提交必须标记 `chore(wip): ...`，且不得发布。
+- `=gh` 只从可发布的非默认任务分支创建 draft PR，并按 PR 模板填写范围、验证、风险和回滚。
 
 `=ai` 执行时：
 
@@ -40,15 +48,16 @@ description: Huli C++ Vulkan 学习仓库的通用 Agent 工作流。Agent 修�
    - 共享工作流、口令、意图识别、跨 Agent 行为：`.agents/skills/huli-workflow/SKILL.zh-CN.md`。
 6. 可从代码或配置直接发现的动态事实以实时文件为权威；一次性环境和验证结果写入带日期和证据的 task 文档，不复制到长期上下文。
 7. 写入前确认事实依据来自用户明确偏好、当前代码、可靠外部来源、已验证命令或已落地设计。
-8. 修改中文源后同步英文 AI 文件，并运行 `tools/sync-agents.ps1 -Check`。
+8. 修改中文源后同步英文 AI 文件，并运行平台适用的同步检查：macOS / Linux 使用 `python3 ./tools/sync-agents.py --check`，Windows PowerShell 使用 `.\tools\sync-agents.ps1 -Check`。
 
 执行 `=br` 时，或用户用自然语言明确要求创建分支时：
 
 1. 先读取 `docs/agents/git.md`，并按其中的 `<type>/<english-kebab-description>` 规范生成名称。
 2. 用户只要求起名或建议时，只返回名称，不修改仓库；只有明确要求创建时才创建并切换。
 3. 检查工作区和已有引用，验证名称；同名引用存在时停止询问，不自动追加后缀或切换。
-4. 默认从当前 `HEAD` 创建并保留未提交改动；不要 stash、reset、clean 或回滚。
-5. 只创建和切换分支，不提交、推送或创建 PR。
+4. 分支应短生命周期且只处理一个目标；`spike` 只用于本地实验，不用于发布 PR。
+5. 默认从当前 `HEAD` 创建并保留未提交改动；不要 stash、reset、clean 或回滚。
+6. 只创建和切换分支，不提交、推送或创建 PR。
 
 `=gc`、`=cm` 和 `=gh` 执行前也读取 `docs/agents/git.md`。
 
@@ -88,6 +97,7 @@ description: Huli C++ Vulkan 学习仓库的通用 Agent 工作流。Agent 修�
 - 不要回滚用户改动，除非用户明确要求。
 - 不要暂存无关文件。
 - 不要默认 `git add .`。
-- 验证失败时不要推送，除非用户明确要求继续。
+- 必要验证失败时不要正常提交或发布；明确授权的 `chore(wip): ...` 兜底提交只能保留在本地。
+- 未经用户明确授权，不直推 `main`、把 draft PR 转为 ready 或合并 PR。
 - 不要修改用户未放入任务范围的外部仓库。
 - 中文 skill 源文件使用 `SKILL.zh-CN.md`，不要放在 `zh-CN/SKILL.md`，避免被 Agent 识别为重复 skill。

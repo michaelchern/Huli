@@ -1,5 +1,5 @@
 # Huli Agent Entry
-<!-- AGENTS_ZH_CN_SHA256: 81df107a09721dabcc887bcff329d90d581938d43f7e2330c610105ce58c21b1 -->
+<!-- AGENTS_ZH_CN_SHA256: 6aee83ad8c8cd369c7879c8e8eeb6d01b916497bc9e7abd9aea7c19127f5d49d -->
 
 > `AGENTS.zh-CN.md` is the Chinese source for the root AI entry.
 > Other Chinese sources live in `docs/agents/zh-CN/`, `docs/tasks/zh-CN/`, and `.agents/skills/*/SKILL.zh-CN.md`.
@@ -15,6 +15,7 @@ When working in this repository:
 - Keep context narrow. Do not load Vulkan, build, and Git context all at once unless the task needs it.
 - Check `git status --short --branch` before editing.
 - Never revert user changes unless explicitly asked.
+- Use PR-first delivery by default: code and documentation enter `main` through a PR from a non-default branch. Never publish failed validation. Do not push directly to `main` or merge a PR without explicit user authorization.
 - Treat the live `CMakeLists.txt` and source tree as authoritative. Do not assume that study material, experiment targets, or runtime entrypoints have been connected to the root build.
 - Keep Huli learning artifacts in this repository. When using external material, state its source and learning purpose instead of copying large sections without explanation.
 - Report verification commands and results for every meaningful change. Docs-only changes normally need sync and diff checks only.
@@ -43,14 +44,29 @@ These skills are plain Markdown and vendor-neutral; they are not Codex-specific.
 - `docs/agents/`: on-demand AI context packs.
 - `docs/tasks/`: short task checklists, topic study state, reproduction steps, and validation recipes.
 - `.agents/skills/`: shared project agent skills.
+- `CONTRIBUTING.md`: contributor-facing entrypoint for branches, commits, validation, and PR delivery.
+- `.github/PULL_REQUEST_TEMPLATE.md`: GitHub PR template for scope, verification, risk, and rollback.
 - `tools/`: agent sync scripts and future lightweight tools.
 
 ## 4. Default Validation
 
 After changing agent docs or skills, check sync:
 
+macOS / Linux:
+
+```bash
+python3 ./tools/sync-agents.py --check
+```
+
+Windows PowerShell:
+
 ```powershell
 .\tools\sync-agents.ps1 -Check
+```
+
+Then check the diff:
+
+```bash
 git diff --check
 ```
 
@@ -70,13 +86,13 @@ Sync all English agent files from Chinese sources.
 - Sync scope includes root `AGENTS.md`, `docs/agents/*.md`, `docs/tasks/*.md`, and project skills.
 - Preserve the same section structure; English should stay short, direct, and AI-context friendly.
 - Update sync markers near the top of matching English files.
-- Run `.\tools\sync-agents.ps1 -Check`.
+- Run the platform-appropriate sync check: `python3 ./tools/sync-agents.py --check` on macOS / Linux, or `.\tools\sync-agents.ps1 -Check` in Windows PowerShell.
 
 ### `=ca`
 
 Check whether all English agent files are synchronized with Chinese sources.
 
-- Only run `.\tools\sync-agents.ps1 -Check`.
+- Only run one platform-appropriate sync check: `python3 ./tools/sync-agents.py --check` on macOS / Linux, or `.\tools\sync-agents.ps1 -Check` in Windows PowerShell.
 - Do not modify files.
 - Discover scope from the actual Chinese sources and check missing targets, orphaned English documents or skills, duplicate markers, and obvious untranslated Chinese body text.
 - If stale, tell the user to run `=sa`.
@@ -96,13 +112,14 @@ Distill durable Huli learning context from this or recent AI conversations into 
 - Confirm the evidence before writing: explicit user preferences, current code facts, verified commands, reliable external sources, or settled designs. If evidence is weak, report candidates instead of turning them into rules.
 - After changing a Chinese source, sync the matching English file and update the SHA256 marker.
 - If nothing is certain or valuable enough to preserve, do not edit files; report candidates and why they were not preserved.
-- Run `.\tools\sync-agents.ps1 -Check` and report the result.
+- Run and report the platform-appropriate sync check: `python3 ./tools/sync-agents.py --check` on macOS / Linux, or `.\tools\sync-agents.ps1 -Check` in Windows PowerShell.
 
 ### `=br <purpose>`
 
 Create and switch to a local branch that follows the Huli convention for the stated purpose.
 
 - Use `<type>/<english-kebab-description>` without tool, user, or date prefixes.
+- Keep branches short-lived and focused on one clear goal. `spike` is local experimentation only and cannot be published as a PR.
 - Inspect the current branch, worktree state, and known local/remote refs first; derive the name from the purpose and validate it with `git check-ref-format --branch`.
 - Create from the current `HEAD` by default; use `main` or another start point only when the user explicitly requests it.
 - Preserve uncommitted changes; do not stash, reset, or revert them.
@@ -115,8 +132,10 @@ Create and switch to a local branch that follows the Huli convention for the sta
 Check whether current changes are ready to publish to GitHub.
 
 - Run `git status --short --branch`.
-- Inspect changed files and relevant diffs.
-- Run relevant validation.
+- Inspect the complete diff, untracked files, and intended submission scope; confirm the change serves one clear goal.
+- Propose a `<type>(<scope>): <Chinese short description>` title; scope is optional.
+- Run relevant validation and report commands, results, omitted checks, and reasons.
+- Identify compatibility, Vulkan lifetime/synchronization, runtime validation, CMake/dependency, cross-platform, and asset risks.
 - Do not stage, commit, push, or create a PR.
 - If ready for a local commit, tell the user they can run `=cm`.
 - Only mention `=gh` when the user explicitly needs a GitHub PR.
@@ -127,7 +146,9 @@ Commit current intended changes to the current local branch only.
 
 - Inspect scope and validation results first.
 - Stage only files related to the current task; do not default to `git add .`.
-- The commit must include a title and a Chinese body summary describing what changed, why it changed, and what was verified.
+- Complete all required validation before a normal commit. If validation fails, only an explicitly requested local `chore(wip): ...` checkpoint is allowed, and it must never be pushed or opened as a PR.
+- Use `<type>(<scope>): <Chinese short description>` for the subject; scope is optional, and breaking changes add `!` after the type or scope.
+- Write the body in Chinese with explicit “changes,” “reason,” and “verification” sections; add “risk” when compatibility or runtime risk exists.
 - Do not push, create a PR, or merge branches.
 - Report branch, commit, and validation results.
 
@@ -138,8 +159,11 @@ Commit current intended changes and publish them to a GitHub PR.
 - Inspect scope and validation results first.
 - Stage only files related to the current task; do not default to `git add .`.
 - If uncommitted changes exist, commit them first using the `=cm` rules.
+- The current branch must be a publishable non-default task branch; `main` and `spike/*` cannot be published by this command.
+- Use `<type>(<scope>): <Chinese short description>` for the PR title and complete `.github/PULL_REQUEST_TEMPLATE.md` truthfully with scope, verification, risk, and rollback.
 - Push the current branch to `origin`.
 - Open a GitHub draft PR.
+- Do not mark the PR ready, merge it, or push directly to `main` unless the user separately authorizes the action and required validation has passed.
 - Report branch, commit, PR URL, and validation results.
 
 ## 6. Sync Rule

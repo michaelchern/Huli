@@ -2,7 +2,7 @@
 name: huli-workflow
 description: Vendor-neutral workflow for AI agents working in the Huli C++ Vulkan learning repository. Use when an agent edits this repo, handles =sa/=ca/=ai/=br/=gc/=cm/=gh commands, or needs routing to branches, builds, GitHub, formatting, Vulkan, or learning context.
 ---
-<!-- HULI_WORKFLOW_SKILL_ZH_CN_SHA256: 312b67d15f3c5029d85d96e3fe1e0ac15f35a24ce3f2d418b40c8bbe5b7aaec3 -->
+<!-- HULI_WORKFLOW_SKILL_ZH_CN_SHA256: d951c094ea6a0e28034a38aea41586900739767d1fc10ebaaaa1548840a84ed5 -->
 
 # Huli Workflow
 
@@ -26,7 +26,15 @@ This skill is plain Markdown so Codex, Claude, Cursor, Gemini CLI, or other agen
 - `=cm`: commit intended changes to the current local branch only.
 - `=gh`: commit intended changes and publish them to a GitHub PR.
 
-For `=sa` and `=ca`, use `tools/sync-agents.ps1`. It discovers Chinese-source pairs dynamically and checks normalized SHA256 markers, missing targets, orphaned English documents or skills, and obvious untranslated body text.
+For `=sa` and `=ca`, use the platform-appropriate sync checker: `python3 ./tools/sync-agents.py --check` on macOS / Linux, or `.\tools\sync-agents.ps1 -Check` in Windows PowerShell. Both discover Chinese-source pairs dynamically and check normalized SHA256 markers, missing targets, orphaned English documents or skills, and obvious untranslated body text.
+
+Git delivery follows this contract; `docs/agents/git.md` is authoritative:
+
+- Use PR-first delivery by default. One branch and PR handle one clear goal, while existing task branches, worktrees, and uncommitted changes take precedence.
+- Commit and PR subjects use `<type>(<scope>): <Chinese short description>` with optional scope. Commit bodies are in Chinese and state the changes, reason, and verification.
+- `=gc` checks the complete diff, untracked files, intended scope, validation results, omitted checks, and risks.
+- `=cm` stages only task files and creates a local commit only after required validation passes. A failed-validation checkpoint must be `chore(wip): ...` and cannot be published.
+- `=gh` creates a draft PR only from a publishable non-default task branch and completes the PR template with scope, verification, risk, and rollback.
 
 For `=ai`:
 
@@ -41,15 +49,16 @@ For `=ai`:
    - Shared workflow, commands, intent recognition, and cross-agent behavior: `.agents/skills/huli-workflow/SKILL.zh-CN.md`.
 6. Treat dynamic facts discoverable from code or configuration as live-file data. Put one-off environments and validation results in dated task documents with evidence instead of copying them into long-lived context.
 7. Confirm evidence before writing: explicit user preferences, current code, reliable external sources, verified commands, or settled designs.
-8. After changing a Chinese source, sync the English AI-facing file and run `tools/sync-agents.ps1 -Check`.
+8. After changing a Chinese source, sync the English AI-facing file and run the platform-appropriate check: `python3 ./tools/sync-agents.py --check` on macOS / Linux, or `.\tools\sync-agents.ps1 -Check` in Windows PowerShell.
 
 For `=br`, or when the user explicitly asks to create a branch in natural language:
 
 1. Read `docs/agents/git.md` and derive a `<type>/<english-kebab-description>` name from the purpose.
 2. If the user only asks for a name or suggestion, return the name without modifying the repository; create and switch only on an explicit creation request.
 3. Inspect the worktree and known refs, then validate the name. If the ref already exists, stop and ask instead of appending a suffix or switching automatically.
-4. Create from the current `HEAD` by default and preserve uncommitted changes; do not stash, reset, clean, or revert them.
-5. Only create and switch branches; do not commit, push, or create a PR.
+4. Keep the branch short-lived and focused on one goal. `spike` is local experimentation only and cannot be published as a PR.
+5. Create from the current `HEAD` by default and preserve uncommitted changes; do not stash, reset, clean, or revert them.
+6. Only create and switch branches; do not commit, push, or create a PR.
 
 For `=gc`, `=cm`, and `=gh`, also read `docs/agents/git.md` before acting.
 
@@ -89,6 +98,7 @@ If a context pack is missing, inspect source files directly and keep the answer 
 - Do not revert user changes unless explicitly asked.
 - Do not stage unrelated files.
 - Do not default to `git add .`.
-- Do not push failed validation unless the user explicitly asks to continue.
+- Do not normally commit or publish failed required validation. An explicitly authorized `chore(wip): ...` checkpoint stays local.
+- Do not push directly to `main`, mark a draft PR ready, or merge a PR without explicit user authorization.
 - Do not modify external repositories outside the user's requested scope.
 - Use `SKILL.zh-CN.md` for Chinese skill sources; do not place Chinese sources at `zh-CN/SKILL.md`, because many agents discover every `SKILL.md` as a separate skill.

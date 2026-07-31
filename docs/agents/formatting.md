@@ -1,5 +1,5 @@
 # Huli Formatting Context
-<!-- AGENT_DOCS_FORMATTING_ZH_CN_SHA256: b7bf2adf8c5669e1da9c6ca264b875f4d2c8eadd44481ffbf63ce34326b75dc8 -->
+<!-- AGENT_DOCS_FORMATTING_ZH_CN_SHA256: f15c483305e7b78d34e377c0c1e979399afe671c957d98227ebb243655e1f6c3 -->
 
 Load this file only for formatting, clang-format, clang-tidy, encoding, or text-style work.
 
@@ -14,7 +14,7 @@ Load this file only for formatting, clang-format, clang-tidy, encoding, or text-
 - After changing `.gitattributes`, validate representative paths with `git check-attr` and inspect the index with `git ls-files --eol`. Run `git add --renormalize .` only when intentionally migrating existing line endings from a clean worktree, then review every staged change.
 - Do not rewrite unrelated files with formatting commands.
 - Format only C++ / shader / CMake files touched by the current task unless the user explicitly asks for a whole-repo format.
-- After agent doc changes, run `.\tools\sync-agents.ps1 -Check` and `git diff --check`.
+- After agent doc changes, run the platform-appropriate sync check and `git diff --check`: use `python3 ./tools/sync-agents.py --check` on macOS / Linux, or `.\tools\sync-agents.ps1 -Check` in Windows PowerShell.
 - `git diff --check` does not cover untracked files. Inspect untracked files explicitly before publication, then run `git diff --cached --check` after staging.
 
 ## Current State

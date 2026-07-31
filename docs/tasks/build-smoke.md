@@ -1,5 +1,5 @@
 # Huli Build Smoke
-<!-- TASK_DOCS_BUILD_SMOKE_ZH_CN_SHA256: 60c012f57d2d0c77236d8bece7e4f5b6e9afcdc38a10e667073f4fbe9cb5feed -->
+<!-- TASK_DOCS_BUILD_SMOKE_ZH_CN_SHA256: 428c0c08b8d96adf8d50932eb9d6a4e9c6238e5d11ab297c977e5ce17c3956ca -->
 
 ## Current Facts
 
@@ -145,7 +145,9 @@ cmake --build --preset msvc-tracy-release --parallel 8
 
 ## Documentation Validation
 
-```powershell
-.\tools\sync-agents.ps1 -Check
+```bash
+python3 ./tools/sync-agents.py --check
 git diff --check
 ```
+
+In Windows PowerShell, replace the first command with `.\tools\sync-agents.ps1 -Check`.
