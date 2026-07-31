@@ -7,18 +7,18 @@
 # Huli
 
 <p align="center">
-  <a href="./README.md">🇨🇳 中文</a> | <a href="./README_EN.md">🇺🇸 English</a>
+  <a href="./README.md">🇨🇳 中文</a> | <a href="./README.en.md">🇺🇸 English</a>
 </p>
 
 <p align="center">
-  <a href="https://github.com/michaelchern/Huli/stargazers">
-    <img src="https://img.shields.io/github/stars/michaelchern/Huli?style=flat-square&color=yellow" alt="GitHub Stars">
+  <a href="#项目目标">
+    <img src="https://img.shields.io/badge/Graphics%20API-Vulkan-AC162C?style=flat-square&logo=vulkan&logoColor=white" alt="Vulkan">
   </a>
-  <a href="https://github.com/michaelchern/Huli/network/members">
-    <img src="https://img.shields.io/github/forks/michaelchern/Huli?style=flat-square&color=blue" alt="GitHub Forks">
+  <a href="#环境与构建">
+    <img src="https://img.shields.io/badge/C%2B%2B-20-00599C?style=flat-square&logo=cplusplus&logoColor=white" alt="C++20">
   </a>
-  <a href="https://github.com/michaelchern/Huli/issues">
-    <img src="https://img.shields.io/github/issues/michaelchern/Huli?style=flat-square&color=red" alt="GitHub Issues">
+  <a href="#环境与构建">
+    <img src="https://img.shields.io/badge/Platforms-Windows%20%7C%20macOS-555555?style=flat-square" alt="Windows and macOS">
   </a>
   <a href="LICENSE">
     <img src="https://img.shields.io/github/license/michaelchern/Huli?style=flat-square&color=green" alt="MIT License">
@@ -26,7 +26,7 @@
 </p>
 
 <p align="center">
-  <strong>深入 Vulkan 图形管线 | 从零构建现代渲染器</strong>
+  <strong>从 Vulkan 基础出发，探索现代实时渲染</strong>
 </p>
 
 </div>
@@ -87,7 +87,7 @@ Huli/
 | 项目 | 环境 |
 | --- | --- |
 | 语言标准 | C++20 |
-| 操作系统 | Windows 10 / Windows 11 / MacOS |
+| 操作系统 | Windows 10 / Windows 11 / macOS |
 | IDE | Visual Studio Community / Visual Studio Code |
 | 构建工具 | CMake 3.28+、Ninja Multi-Config |
 | 编译器 | MSVC、LLVM Clang、Apple Clang |
@@ -102,7 +102,7 @@ Huli/
 - [Ninja](https://ninja-build.org/)
 - [Vulkan SDK](https://vulkan.lunarg.com/)；推荐使用 `1.4.350.0`
 - Windows：Visual Studio 2022 的“使用 C++ 的桌面开发”工作负载，或可用的 LLVM Clang 工具链
-- MacOS：Xcode Command Line Tools，以及包含 MoltenVK 的 Vulkan SDK
+- macOS：Xcode Command Line Tools，以及包含 MoltenVK 的 Vulkan SDK
 
 首次配置时 CMake 会下载项目所需的第三方依赖，因此需要可用的网络连接。
 
@@ -127,7 +127,7 @@ cmake --build --preset msvc-debug --target huli_example1 --parallel 8
 
 如需使用 LLVM Clang，可将配置预设替换为 `ninja-clang`，并使用 `clang-debug`、`clang-release` 或 `clang-relwithdebinfo` 构建预设。
 
-### MacOS
+### macOS
 
 ```bash
 cmake --preset ninja-macos
@@ -162,17 +162,6 @@ cmake --list-presets=all
 | 08 | OpenXR 与 VR | ⬜ | ⬜ |
 
 > **图例**：✅ 已完成　|　🚧 进行中　|　⬜ 计划中
-
-## 笔记与备忘
-
-学习记录、构建验证步骤和可复用的任务状态保存在 `docs/tasks/`；面向 AI 工具的仓库规则和领域上下文保存在 `AGENTS.md` 与 `docs/agents/`。内容包括：
-
-- 关键 API 调用链与管线状态图解
-- 调试过程中遇到的驱动、验证层问题及解决方案
-- 不同 GPU 和平台上的行为与性能差异观察
-- 对渲染技术的个人思考与改进尝试
-
-希望这些内容能对同样在 Vulkan 领域摸索的朋友有所启发。
 
 ## 许可与声明
 
