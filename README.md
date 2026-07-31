@@ -1,20 +1,24 @@
 <div align="center">
 
 <p align="center">
-  <img src="docs/image/readme-hero.webp" alt="Huli | Vulkan Graphics Playground" width="720">
+  <img src="docs/image/readme-hero.webp" alt="Huli | Vulkan Graphics Playground">
 </p>
 
-# 🦊 Huli — Vulkan 图形编程实践
+# Huli
 
 <p align="center">
-  <a href="https://github.com/michaelchern/Huli/stargazers">
-    <img src="https://img.shields.io/github/stars/michaelchern/Huli?style=flat-square&color=yellow" alt="GitHub Stars">
+  <a href="./README.md">🇨🇳 中文</a> | <a href="./README.en.md">🇺🇸 English</a>
+</p>
+
+<p align="center">
+  <a href="#项目目标">
+    <img src="https://img.shields.io/badge/Graphics%20API-Vulkan-AC162C?style=flat-square&logo=vulkan&logoColor=white" alt="Vulkan">
   </a>
-  <a href="https://github.com/michaelchern/Huli/network/members">
-    <img src="https://img.shields.io/github/forks/michaelchern/Huli?style=flat-square&color=blue" alt="GitHub Forks">
+  <a href="#环境与构建">
+    <img src="https://img.shields.io/badge/C%2B%2B-20-00599C?style=flat-square&logo=cplusplus&logoColor=white" alt="C++20">
   </a>
-  <a href="https://github.com/michaelchern/Huli/issues">
-    <img src="https://img.shields.io/github/issues/michaelchern/Huli?style=flat-square&color=red" alt="GitHub Issues">
+  <a href="#环境与构建">
+    <img src="https://img.shields.io/badge/Platforms-Windows%20%7C%20macOS-555555?style=flat-square" alt="Windows and macOS">
   </a>
   <a href="LICENSE">
     <img src="https://img.shields.io/github/license/michaelchern/Huli?style=flat-square&color=green" alt="MIT License">
@@ -22,22 +26,19 @@
 </p>
 
 <p align="center">
-  <strong>深入 Vulkan 图形管线 | 从零构建现代渲染引擎</strong>
+  <strong>从 Vulkan 基础出发，探索现代实时渲染</strong>
 </p>
 
 </div>
 
 ---
 
-一个使用 C++20 探索现代 Vulkan 图形技术的个人学习与实验仓库。
-
-项目从 Vulkan 基础设施与桌面示例开始，逐步实践 GPU 驱动渲染、延迟着色、顺序无关透明、抗锯齿、光线追踪与 VR 渲染等现代图形技术。当前根 CMake 工程已接入 `huli_vulkan`、`huli_render` 和桌面示例 `huli_example1`；后续实验会随着学习进度逐步加入。
+一个使用 C++20 探索现代 Vulkan 图形技术的个人学习与实验仓库。项目从 Vulkan 基础设施与桌面示例开始，逐步实践 GPU 驱动渲染、延迟着色、顺序无关透明、抗锯齿、光线追踪与 VR 渲染等现代图形技术。
 
 - [🚀 项目目标](#项目目标)
 - [🗂️ 仓库结构](#仓库结构)
 - [💻 环境与构建](#环境与构建)
 - [📋 模块进度](#模块进度)
-- [✍️ 笔记与备忘](#笔记与备忘)
 - [📄 许可与声明](#许可与声明)
 
 ## 项目目标
@@ -60,7 +61,7 @@
 > 以下目录结构仍是规划草案，项目最终组织方式尚未确定，暂时保持不变。当前可构建目标请以根目录 `CMakeLists.txt` 和实际源码树为准。
 
 ```text
-huli/
+Huli/
 ├── modules/                  # 各个独立的实验模块
 │   ├── 01_core_framework/    # 基础框架：实例、设备、交换链、资源管理
 │   ├── 02_vertex_pulling/    # 可编程顶点拉取与间接绘制
@@ -86,8 +87,8 @@ huli/
 | 项目 | 环境 |
 | --- | --- |
 | 语言标准 | C++20 |
-| 操作系统 | Windows 11 / macOS |
-| IDE | Visual Studio 2022 Community / Visual Studio Code |
+| 操作系统 | Windows 10 / Windows 11 / macOS |
+| IDE | Visual Studio Community / Visual Studio Code |
 | 构建工具 | CMake 3.28+、Ninja Multi-Config |
 | 编译器 | MSVC、LLVM Clang、Apple Clang |
 | Vulkan SDK | 推荐 1.4.350.0 |
@@ -149,29 +150,18 @@ cmake --list-presets=all
 
 下表是学习路线规划，并不表示所有模块都已接入当前根 CMake 工程；实际可构建内容请以源码和 `CMakeLists.txt` 为准。
 
-| 模块 | 内容 | 状态 | 可运行 | 笔记 |
-| :---: | --- | :---: | :---: | :---: |
-| 01 | 核心框架 | ✅ | ✅ | ✅ |
-| 02 | 可编程顶点拉取 | 🚧 | 🚧 | 🚧 |
-| 03 | GPU 驱动渲染 | ⬜ | ⬜ | ⬜ |
-| 04 | 延迟渲染 | ⬜ | ⬜ | ⬜ |
-| 05 | 顺序无关透明 | ⬜ | ⬜ | ⬜ |
-| 06 | 抗锯齿实验 | ⬜ | ⬜ | ⬜ |
-| 07 | 光线追踪 | ⬜ | ⬜ | ⬜ |
-| 08 | OpenXR 与 VR | ⬜ | ⬜ | ⬜ |
+| 模块 | 内容 | 状态 | 可运行 |
+| :---: | --- | :---: | :---: |
+| 01 | 核心框架 | ✅ | ✅ |
+| 02 | 可编程顶点拉取 | 🚧 | 🚧 |
+| 03 | GPU 驱动渲染 | ⬜ | ⬜ |
+| 04 | 延迟渲染 | ⬜ | ⬜ |
+| 05 | 顺序无关透明 | ⬜ | ⬜ |
+| 06 | 抗锯齿实验 | ⬜ | ⬜ |
+| 07 | 光线追踪 | ⬜ | ⬜ |
+| 08 | OpenXR 与 VR | ⬜ | ⬜ |
 
 > **图例**：✅ 已完成　|　🚧 进行中　|　⬜ 计划中
-
-## 笔记与备忘
-
-学习记录、构建验证步骤和可复用的任务状态保存在 `docs/tasks/`；面向 AI 工具的仓库规则和领域上下文保存在 `AGENTS.md` 与 `docs/agents/`。内容包括：
-
-- 关键 API 调用链与管线状态图解
-- 调试过程中遇到的驱动、验证层问题及解决方案
-- 不同 GPU 和平台上的行为与性能差异观察
-- 对渲染技术的个人思考与改进尝试
-
-希望这些内容能对同样在 Vulkan 领域摸索的朋友有所启发。
 
 ## 许可与声明
 
@@ -181,4 +171,4 @@ cmake --list-presets=all
 
 通过 CMake 获取的第三方依赖，以及仓库中引用的模型、纹理等社区资源，分别遵循其原始作者和项目所声明的许可条款；相关版权归各自权利人所有。
 
-欢迎探索，欢迎交流。让我们一起把 GPU 的潜力逼到极致。🔥
+欢迎探索，欢迎交流。让我们一起把 GPU 的潜力逼到极致。
