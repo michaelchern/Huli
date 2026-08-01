@@ -1,5 +1,5 @@
 # Huli Codegraph Context
-<!-- AGENT_DOCS_CODEGRAPH_ZH_CN_SHA256: deed6a223e6ef5073633154c27012a2c023859242da6dbed6a98be74049a5792 -->
+<!-- AGENT_DOCS_CODEGRAPH_ZH_CN_SHA256: 2d856ff795fbe171818563c3b3dd2d64f2ed947967dbaf3ed3e67b20fb686ff2 -->
 
 Load this file only for symbol lookup, call chains, refactor impact, architecture understanding, or "where is this defined / who calls this" work.
 
@@ -12,4 +12,4 @@ Load this file only for symbol lookup, call chains, refactor impact, architectur
 ## Common Questions
 
 - "Where is this Vulkan object created?" Check Huli first. If it is not implemented, state that directly.
-- "How should this topic be reproduced?" Confirm the reference source, then write the smallest Huli experiment into `docs/tasks/zh-CN/*.md`.
+- "How should this topic be reproduced?" Confirm the reference source, then provide the smallest Huli experiment and validation steps in the current answer; do not create a state document by default.

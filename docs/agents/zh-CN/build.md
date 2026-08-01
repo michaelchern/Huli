@@ -110,5 +110,5 @@ ASan preset 通过 `CFLAGS` / `CXXFLAGS` 添加 `/fsanitize=address`，并使用
 - CMake、依赖版本或构建选项改动后，运行全新目录配置、完整构建和 `git diff --check`。
 - 修改 `huli_vulkan` 的依赖范围后，除编译静态库外，还要用临时下游 executable 仅链接 `Huli::Vulkan`；静态库归档成功不能发现所有缺失的最终链接依赖。
 - 纯文档改动不要求重新编译，但必须运行平台适用的 Agent 同步检查和 `git diff --check`；macOS / Linux 使用 `python3 ./tools/sync-agents.py --check`，Windows PowerShell 使用 `.\tools\sync-agents.ps1 -Check`。
-- 一次性工具版本、构建目录和验证结果写入带日期与命令的 `docs/tasks/` 文档，不要升级为无时间边界的长期规则。
+- 一次性工具版本、构建目录和验证结果只在当前任务中汇报；只有反复有用的验证入口才更新本文件，不要把临时快照升级为无时间边界的长期规则。
 - 如果只验证了第三方依赖、`huli_vulkan` 或 `huli_example1` 编译链接，明确报告验证范围；不要据此声称 Vulkan 运行路径已经通过。runtime smoke 必须在 Vulkan validation layer 已启用时单独启动应用、保留第一条 VUID，并区分验证回调断点与真正根因；禁用验证层只能证明未检查状态下的启动行为。

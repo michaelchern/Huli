@@ -30,10 +30,10 @@ description: Huli C++ Vulkan 学习仓库的通用 Agent 工作流。Agent 修�
 Git 交付默认遵循以下契约，细节以 `docs/agents/git.md` 为准：
 
 - 默认 PR-first，一个分支和 PR 只处理一个清晰目标；已有任务分支、worktree 和未提交改动优先保留。
-- commit 与 PR 标题使用 `<type>(<scope>): <中文简述>`，scope 可省略；commit 正文用中文写明变更、原因和验证。
+- commit 与 PR 标题使用 `<type>(<scope>): <中文简述>`，scope 可省略；普通 commit 正文可省略，破坏性变更、WIP 或重大风险必须写中文正文，完整验证和风险由 PR Description 承载。
 - `=gc` 必须检查完整 diff、未跟踪文件、拟提交范围、验证结果、未验证项和风险。
 - `=cm` 只暂存任务文件，并在必要验证通过后创建本地提交；验证失败的兜底提交必须标记 `chore(wip): ...`，且不得发布。
-- `=gh` 只从可发布的非默认任务分支创建 draft PR，并按 PR 模板填写范围、验证、风险和回滚。
+- `=gh` 只从可发布的非默认任务分支创建 draft PR，运行 PR policy checker，按模板填写范围、验证、风险和回滚，并等待 `quality-gate`。
 
 `=ai` 执行时：
 
@@ -44,9 +44,8 @@ Git 交付默认遵循以下契约，细节以 `docs/agents/git.md` 为准：
 5. 按归属写入：
    - 根仓库规则：`AGENTS.zh-CN.md`。
    - 长期领域上下文：`docs/agents/zh-CN/*.md`。
-   - 主题状态、复现步骤、验证配方：`docs/tasks/zh-CN/*.md`。
    - 共享工作流、口令、意图识别、跨 Agent 行为：`.agents/skills/huli-workflow/SKILL.zh-CN.md`。
-6. 可从代码或配置直接发现的动态事实以实时文件为权威；一次性环境和验证结果写入带日期和证据的 task 文档，不复制到长期上下文。
+6. 可从代码或配置直接发现的动态事实以实时文件为权威；一次性环境、命令输出和验证结果只在当前任务中汇报，不复制到长期上下文。
 7. 写入前确认事实依据来自用户明确偏好、当前代码、可靠外部来源、已验证命令或已落地设计。
 8. 修改中文源后同步英文 AI 文件，并运行平台适用的同步检查：macOS / Linux 使用 `python3 ./tools/sync-agents.py --check`，Windows PowerShell 使用 `.\tools\sync-agents.ps1 -Check`。
 
@@ -68,7 +67,7 @@ Git 交付默认遵循以下契约，细节以 `docs/agents/git.md` 为准：
 - GitHub publish / PR / commit：`docs/agents/git.md`
 - 格式化 / 风格：`docs/agents/formatting.md`
 - Vulkan 概念和调试：`docs/agents/vulkan.md`
-- 学习笔记和主题状态：`docs/agents/learning.md`
+- 学习方法和概念解释：`docs/agents/learning.md`
 
 如果上下文包不存在，直接检查源码，并在回答里说明假设。
 
@@ -82,13 +81,13 @@ Git 交付默认遵循以下契约，细节以 `docs/agents/git.md` 为准：
 
 - 当前没有固定教材或参考仓库，不要假设外部路径存在。
 - 使用外部材料时说明来源、版本和学习目的。
-- Huli 的实验、笔记和任务状态都写入 Huli 仓库。
+- Huli 中值得长期保留的学习结论和复用规则写入 Huli 仓库。
 
 ## AI 资料和 Skill 设计
 
-- Huli 保持薄路由：根 `AGENTS` 只放入口规则，长期领域上下文放 `docs/agents/zh-CN/`，短任务清单和主题学习状态放 `docs/tasks/zh-CN/`，skill 只承载强触发的工作流和意图识别。
+- Huli 保持薄路由：根 `AGENTS` 只放入口规则，长期领域上下文放 `docs/agents/zh-CN/`，skill 只承载强触发的工作流和意图识别。
 - 不要整体照搬 Horizon 或其他仓库的 AI 框架。借鉴前先比较仓库目标、语言源、同步机制、上下文体量和过期风险。
-- 多轮或长任务默认使用 `docs/tasks/zh-CN/study-template.md`。用户明确要求文件规划工作流时，可以把 `.planning/<plan-id>/` 作为被 Git 忽略的本机活动状态；完成后只把稳定结论沉淀到 `docs/tasks/zh-CN/`。
+- 默认不为单次或长任务创建仓库内状态文档；活动状态留在当前对话中。只有用户明确要求创建文档时才新增文件，并把稳定、可复用的结论放入归属明确的长期资料。
 - 不要把本地安装的可选 skill 路径写入项目规则，也不要把会话流水账当作长期知识提交。
 - 只有存在明确触发词、重复工作流或高频误判风险时才新增 skill；每个 skill 必须有准确的 frontmatter `description`。
 
@@ -97,7 +96,7 @@ Git 交付默认遵循以下契约，细节以 `docs/agents/git.md` 为准：
 - 不要回滚用户改动，除非用户明确要求。
 - 不要暂存无关文件。
 - 不要默认 `git add .`。
-- 必要验证失败时不要正常提交或发布；明确授权的 `chore(wip): ...` 兜底提交只能保留在本地。
+- 必要验证或 `quality-gate` 失败时不要正常提交或发布；明确授权的 `chore(wip): ...` 兜底提交只能保留在本地。
 - 未经用户明确授权，不直推 `main`、把 draft PR 转为 ready 或合并 PR。
 - 不要修改用户未放入任务范围的外部仓库。
 - 中文 skill 源文件使用 `SKILL.zh-CN.md`，不要放在 `zh-CN/SKILL.md`，避免被 Agent 识别为重复 skill。

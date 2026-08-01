@@ -1,5 +1,5 @@
 # Huli Agent Context Index
-<!-- AGENT_DOCS_INDEX_ZH_CN_SHA256: f8d8601e06939e117dc3a7d08353d3cf3f1df1b43b6aa521f080c86a85122c07 -->
+<!-- AGENT_DOCS_INDEX_ZH_CN_SHA256: a5a6ad23cdad541d3a5b464f5594197a7127fba066eb69a4096ac028b50d02a6 -->
 
 Load the smallest useful context. Read root `AGENTS.md` first, then choose one or a few files from this router.
 
@@ -10,7 +10,7 @@ Load the smallest useful context. Read root `AGENTS.md` first, then choose one o
 - Formatting, clang-format, clang-tidy: `docs/agents/formatting.md`
 - Codegraph, symbol lookup, call chains, impact: `docs/agents/codegraph.md`
 - Vulkan concepts, validation layers, GPU debugging: `docs/agents/vulkan.md`
-- Study notes, topic state, reproduction records: `docs/agents/learning.md`
+- Learning methods, concept explanations, and reproduction guidance: `docs/agents/learning.md`
 
 ## Default Flow
 

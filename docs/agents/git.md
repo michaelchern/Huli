@@ -1,13 +1,14 @@
 # Huli Git Workflow Context
-<!-- AGENT_DOCS_GIT_ZH_CN_SHA256: 740bce71d7e4cfdfe0ce89cb021229aa5a6c5bd3f3678d749d2e6dcd49bde610 -->
+<!-- AGENT_DOCS_GIT_ZH_CN_SHA256: 552cb332658f3febfd77354e557c13dd20ca0cf56e66677ec63b3ba2b0988b44 -->
 
 Load this file only for `=br`, `=gc`, `=cm`, `=gh`, branches, commits, pushes, PRs, reviews, or publication checks.
 
-This workflow references `makecindy/cindy` `main@9254c053` (2026-07-31), adapting its PR-first, Conventional Commit, validation-gate, risk-disclosure, and review ideas to Huli's C++20/Vulkan learning scope. It does not add DCO, automated code review, or new build CI.
+This workflow references `makecindy/cindy` `main@9254c053` (2026-07-31), adapting its PR-first, Conventional Commit, validation-gate, risk-disclosure, and review ideas to Huli's C++20/Vulkan learning scope. Huli adds only a lightweight `quality-gate`, not DCO, automated code review, or full Vulkan build CI.
 
 ## Delivery Principles
 
 - Use PR-first delivery by default: code and documentation enter `main` through a PR from a non-default branch.
+- `main` accepts Squash merge only. PRs require `quality-gate` but no approval from another person, and merged task branches are deleted automatically.
 - Keep each branch, commit, and PR focused on one clear goal; exclude incidental fixes and unrelated generated files.
 - Existing task branches, worktrees, and uncommitted changes take precedence. Do not move, stash, reset, clean, or revert existing work merely to fit the workflow.
 - Do not push directly to `main`, mark a draft PR ready, merge a PR, or publish without explicit user authorization.
@@ -56,29 +57,26 @@ Use this format for commit and PR subjects:
 - Add `!` after the type or scope for a breaking change, then add a `BREAKING CHANGE:` section to the body describing impact and migration.
 - `spike` is not a publishable subject type. When an experiment becomes deliverable, use the type that matches the final result.
 
-Commit bodies must be written in Chinese and contain sections equivalent to:
+Normal local commits require only a conforming subject; their bodies are optional. The PR Description is the authoritative record for scope, validation, omitted checks, risk, and rollback.
 
-```text
-Changes:
-- ...
+A Chinese commit body is required for:
 
-Reason:
-- ...
+- Breaking changes: add `BREAKING CHANGE:` with impact and migration guidance.
+- Local `chore(wip): ...` checkpoints: record the failed command and blocker.
+- Material compatibility, Vulkan runtime, or rollback risk: describe the risk and mitigation.
 
-Verification:
-- <command> — <result>
-```
-
-Add a risk section when compatibility, runtime, or rollback risk exists. Never claim an unexecuted check passed.
+Whether or not a commit has a body, never claim an unexecuted check passed. Agents must report actual validation in the current task response.
 
 ## Validation Gate
 
 - Inspect the complete diff and untracked files before staging; run `git diff --cached --check` after staging.
+- Before publication, run `python3 ./tools/check_pr_policy.py --title "<PR title>" --base <base>` to check the PR title, all non-merge commit subjects in the PR range, and unpublished WIP commits.
 - After changing agent documentation or skills, run the platform-appropriate sync check: `python3 ./tools/sync-agents.py --check` on macOS / Linux, or `.\tools\sync-agents.ps1 -Check` in Windows PowerShell. Confirm that the Chinese and English meanings agree.
 - For C++, CMake, shader, example, or tool changes, run the smallest relevant formatting, configure, build, or test checks defined by `docs/agents/build.md` and `docs/agents/formatting.md`.
 - Vulkan compilation and linking do not prove runtime correctness. Run a separate runtime smoke for runtime behavior changes and report the first validation error or VUID.
 - If a highly relevant check cannot run, state why, what remains uncovered, and the risk. Whether a check is required depends on the change type and available platform.
 - If required validation fails, both `=cm` and `=gh` stop. When the user explicitly requests a data-preservation or checkpoint commit, use `chore(wip): <Chinese short description>`, record the failed command and blocker in the body, and never push or open a PR from it.
+- GitHub `quality-gate` always checks subjects/WIP, the PR diff, Agent-document synchronization, and CMake preset parsing. This lightweight repository gate does not replace risk-based local builds or Vulkan runtime smoke.
 
 ## `=br <purpose>` Branch Creation
 
@@ -113,7 +111,7 @@ Do not push, create a PR, or merge branches.
 2. Confirm the changes serve one clear goal. Stage only intended task files; do not default to `git add .`.
 3. Inspect `git diff --cached` and run `git diff --cached --check` to ensure no unrelated work was included.
 4. Run every required check. Any failed required validation stops the normal commit workflow.
-5. Commit with a `<type>(<scope>): <Chinese short description>` subject and a Chinese body covering changes, reason, and verification. Add risk when needed and `BREAKING CHANGE:` for breaking changes.
+5. Commit with a `<type>(<scope>): <Chinese short description>` subject. A normal body is optional; breaking changes, `chore(wip)`, and material compatibility/runtime risks use the body rules above.
 6. Only an explicit request may create `chore(wip): ...` after validation failure; clearly mark it as non-publishable.
 7. Stop after creating the local commit.
 8. Report branch, commit hash, included files, and validation results.
@@ -123,12 +121,19 @@ Do not push, create a PR, or merge branches.
 1. Run `git status --short --branch` and inspect the complete diff, untracked files, and existing user changes.
 2. The current branch must be a publishable non-default task branch. Stop on `main` or `spike/*` and require an appropriate task branch first.
 3. If uncommitted changes exist, follow `=cm` to stage only target files, complete required validation, and create a local commit.
-4. Confirm no commit being published uses `chore(wip): ...`, all required validation passed, and the changes serve one PR goal.
+4. Run the PR policy checker and confirm every published commit subject conforms, no `wip:` / `chore(wip): ...` commit is present, all required validation passed, and the changes serve one PR goal.
 5. Use `<type>(<scope>): <Chinese short description>` for the PR title. For a multi-commit PR, summarize the overall result instead of copying the final commit subject mechanically.
 6. Complete `.github/PULL_REQUEST_TEMPLATE.md` truthfully with summary, included/excluded scope, user-visible changes, actual checks, omitted checks, risks, and rollback.
-7. Push the current branch to `origin` and open a GitHub draft PR.
-8. Do not mark it ready, merge it, or push directly to `main` automatically. Those actions require separate explicit user authorization and passing required validation.
-9. Report branch, commit hashes, PR URL, validation results, unverified scope, and primary risks.
+7. Push the current branch to `origin`, open a GitHub draft PR, and wait for an explicit `quality-gate` result.
+8. Do not mark it ready, Squash merge it, or push directly to `main` automatically. Those actions require separate explicit user authorization and passing required validation plus `quality-gate`.
+9. Report branch, commit hashes, PR URL, `quality-gate`, local validation, unverified scope, and primary risks.
+
+## GitHub Remote Baseline
+
+- Enable Squash merge only. Use the PR Title as the Squash subject and PR Description as its body, disable merge commits and rebase merges, and automatically delete merged task branches.
+- Require a PR for `main`. The approval count is `0` for solo maintenance, while the repository owner remains subject to protection.
+- Require `quality-gate` as a strict status check against the latest `main`; require linear history and block force-pushes and deletion of `main`.
+- Do not require DCO, commit signatures, CODEOWNERS, another reviewer, or resolved review conversations. Emergency bypasses require a temporary explicit protection change rather than a permanent bypass.
 
 ## Review Severity
 
@@ -145,5 +150,5 @@ Read the applicable Huli rules and the complete diff before reviewing. Report on
 - Do not commit credentials, tokens, authorization files, personal data, or unintended generated files.
 - `=cm` never pushes, creates a PR, or merges branches.
 - `=gh` creates a draft PR by default.
-- Do not publish when required validation fails or a `chore(wip): ...` commit is present.
+- Do not publish when required validation or `quality-gate` fails, or when a WIP commit is present.
 - Do not push directly to `main`, mark a draft PR ready, merge a PR, or publish without explicit user authorization.

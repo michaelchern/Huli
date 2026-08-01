@@ -130,18 +130,17 @@ def discover_pairs() -> list[SyncPair]:
     pairs.extend(
         document_pairs("docs/agents/zh-CN", "docs/agents", "AGENT_DOCS", "agent context")
     )
-    pairs.extend(
-        document_pairs("docs/tasks/zh-CN", "docs/tasks", "TASK_DOCS", "task document")
-    )
     pairs.extend(skill_pairs())
     return pairs
 
 
 def orphaned_targets(known_targets: set[str]) -> list[str]:
     candidates: list[Path] = []
-    for directory in (REPO_ROOT / "docs/agents", REPO_ROOT / "docs/tasks"):
-        if directory.is_dir():
-            candidates.extend(path for path in directory.glob("*.md") if path.is_file())
+    documents_root = REPO_ROOT / "docs/agents"
+    if documents_root.is_dir():
+        candidates.extend(
+            path for path in documents_root.glob("*.md") if path.is_file()
+        )
 
     skills_root = REPO_ROOT / ".agents/skills"
     if skills_root.is_dir():

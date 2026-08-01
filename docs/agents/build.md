@@ -1,5 +1,5 @@
 # Huli Build Context
-<!-- AGENT_DOCS_BUILD_ZH_CN_SHA256: 2e5f03d70623a88bdddc69fe25983df90f20a2cf3519e4528a880858377c85a5 -->
+<!-- AGENT_DOCS_BUILD_ZH_CN_SHA256: 238be1d9995497a4c5d9e2eecc3a379444ff12f44e431e17ac1136ff2ee3e4fa -->
 
 Load this file only for CMake, build, Visual Studio, validation-command, or compiler-error work.
 
@@ -111,5 +111,5 @@ The ASan preset adds `/fsanitize=address` through `CFLAGS` / `CXXFLAGS` and uses
 - After CMake, dependency-version, or build-option changes, run a fresh configure, complete build, and `git diff --check`.
 - After changing `huli_vulkan` dependency visibility, compile the static library and link a temporary downstream executable against `Huli::Vulkan`; archive creation alone cannot expose every missing final-link dependency.
 - Docs-only changes do not require a rebuild, but must pass the platform-appropriate agent sync check and `git diff --check`: use `python3 ./tools/sync-agents.py --check` on macOS / Linux, or `.\tools\sync-agents.ps1 -Check` in Windows PowerShell.
-- Put one-off tool versions, build directories, and validation results in dated `docs/tasks/` documents rather than promoting them to timeless domain rules.
+- Report one-off tool versions, build directories, and validation results only in the current task. Update this file only with repeatedly useful validation entrypoints; do not promote temporary snapshots to timeless domain rules.
 - If only dependencies, `huli_vulkan`, or `huli_example1` compilation/linking were validated, report that exact scope; do not claim that the Vulkan runtime passed. A runtime smoke must launch the application with the Vulkan validation layer enabled, preserve the first VUID, and distinguish a validation-callback breakpoint from the underlying cause. A run with validation disabled proves only unchecked startup behavior.

@@ -9,7 +9,7 @@
     {
       "name": "base",
       "hidden": true,
-      "installDir": "${sourceDir}/out/install/${presetName}",
+      "installDir": "${sourceDir}/install/${presetName}",
       "cacheVariables": {
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
         "BUILD_TESTING": null,
@@ -25,7 +25,7 @@
       "description": "Windows x64 - Ninja Multi-Config + MSVC",
       "inherits": "base",
       "generator": "Ninja Multi-Config",
-      "binaryDir": "${sourceDir}/out/build/ninja-msvc",
+      "binaryDir": "${sourceDir}/build/ninja-msvc",
       "architecture": {
         "value": "x64",
         "strategy": "external"
@@ -50,7 +50,7 @@
       "description": "Windows x64 - Ninja Multi-Config + LLVM Clang (GNU-style driver)",
       "inherits": "base",
       "generator": "Ninja Multi-Config",
-      "binaryDir": "${sourceDir}/out/build/ninja-clang",
+      "binaryDir": "${sourceDir}/build/ninja-clang",
       "cacheVariables": {
         "CMAKE_C_COMPILER": "clang",
         "CMAKE_CXX_COMPILER": "clang++"
@@ -66,7 +66,7 @@
       "displayName": "Ninja MSVC AddressSanitizer",
       "description": "Windows x64 - MSVC AddressSanitizer, built as RelWithDebInfo",
       "inherits": "ninja-msvc",
-      "binaryDir": "${sourceDir}/out/build/ninja-msvc-asan",
+      "binaryDir": "${sourceDir}/build/ninja-msvc-asan",
       "environment": {
         "CFLAGS": "$penv{CFLAGS} /fsanitize=address",
         "CXXFLAGS": "$penv{CXXFLAGS} /fsanitize=address"
@@ -77,7 +77,7 @@
       "displayName": "Ninja MSVC Tracy",
       "description": "Windows x64 - MSVC release build with Tracy and call stacks enabled",
       "inherits": "ninja-msvc",
-      "binaryDir": "${sourceDir}/out/build/ninja-msvc-tracy",
+      "binaryDir": "${sourceDir}/build/ninja-msvc-tracy",
       "cacheVariables": {
         "TRACY_ENABLE": "ON",
         "TRACY_CALLSTACK": "ON"
@@ -89,7 +89,7 @@
       "description": "macOS - Ninja Multi-Config + Apple Clang",
       "inherits": "base",
       "generator": "Ninja Multi-Config",
-      "binaryDir": "${sourceDir}/out/build/ninja-macos",
+      "binaryDir": "${sourceDir}/build/ninja-macos",
       "condition": {
         "type": "equals",
         "lhs": "${hostSystemName}",

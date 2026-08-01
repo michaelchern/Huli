@@ -1,7 +1,7 @@
 # Huli AI 入口
 
 > 本文件是根 AI 入口的中文源文件。修改根规则时，先改这里，再同步更新 `AGENTS.md`。
-> 其他中文源位于 `docs/agents/zh-CN/`、`docs/tasks/zh-CN/` 和 `.agents/skills/*/SKILL.zh-CN.md`。
+> 其他中文源位于 `docs/agents/zh-CN/` 和 `.agents/skills/*/SKILL.zh-CN.md`。
 > 英文文件是 AI 默认读取入口，必须与中文源保持一致。
 
 ## 1. 核心原则
@@ -14,7 +14,7 @@ AI 在本仓库工作时必须：
 - 只加载当前任务需要的上下文，避免把 Vulkan、构建和 Git 流程一次性塞满上下文。
 - 修改前查看 `git status --short --branch`。
 - 不要回滚用户已有改动。
-- 默认采用 PR-first：代码和文档从非默认分支通过 PR 进入 `main`；不要发布验证失败的改动；未经用户明确授权，不直推 `main` 或合并 PR。
+- 默认采用 PR-first：代码和文档从非默认分支通过 Squash merge 进入 `main`；PR 必须通过轻量 `quality-gate`；不要发布验证失败的改动；未经用户明确授权，不直推 `main` 或合并 PR。
 - 以当前 `CMakeLists.txt` 和源码目录为准，不要假设尚未接入根构建的教材、实验目标或运行入口已经存在。
 - Huli 的学习产物应落在本仓库；引用外部材料时说明来源和学习目的，不要无说明地大段复制。
 - 每次实质改动都给出验证命令和结果；纯文档改动通常只需要同步检查和 diff 检查。
@@ -29,7 +29,7 @@ AI 在本仓库工作时必须：
 - 格式化、clang-format、clang-tidy：`docs/agents/formatting.md`
 - codegraph、符号流、调用链、重构影响面：`docs/agents/codegraph.md`
 - Vulkan 概念、调试、验证层、GPU 现象解释：`docs/agents/vulkan.md`
-- 学习笔记、主题状态、理解/复现记录：`docs/agents/learning.md`
+- 学习方法、概念解释、复现建议：`docs/agents/learning.md`
 
 项目内共享 Agent skill：
 
@@ -41,11 +41,11 @@ AI 在本仓库工作时必须：
 
 - `CMakeLists.txt`：根构建入口和实时依赖版本权威；当前可构建依赖目标、`huli_vulkan`、`huli_render`，并在非 Android 桌面平台构建 `huli_example1`。
 - `docs/agents/`：按需加载的 AI 上下文包。
-- `docs/tasks/`：短小任务清单、主题学习状态、复现步骤和验证配方。
 - `.agents/skills/`：项目共享 Agent skill。
 - `CONTRIBUTING.md`：面向贡献者的分支、提交、验证和 PR 流程入口。
 - `.github/PULL_REQUEST_TEMPLATE.md`：GitHub PR 的范围、验证、风险和回滚说明模板。
-- `tools/`：Agent 同步脚本和后续轻量工具。
+- `.github/workflows/pr-quality.yml`：PR 标题、WIP、diff、Agent 同步与 CMake preset 的轻量门禁。
+- `tools/`：Agent 同步脚本、PR policy checker 和后续轻量工具。
 
 ## 4. 默认验证
 
@@ -82,7 +82,7 @@ C++ / CMake / shader / 示例改动按需运行最小相关验证。当前根 CM
 根据中文源同步所有英文 Agent 文件。
 
 - 不要修改中文源文件。
-- 同步范围包括根 `AGENTS.md`、`docs/agents/*.md`、`docs/tasks/*.md` 和项目 skills。
+- 同步范围包括根 `AGENTS.md`、`docs/agents/*.md` 和项目 skills。
 - 保持章节结构一致；英文要短、直接、适合作为 AI 上下文。
 - 更新对应英文文件顶部的 sync marker。
 - 运行平台适用的同步检查：macOS / Linux 使用 `python3 ./tools/sync-agents.py --check`，Windows PowerShell 使用 `.\tools\sync-agents.ps1 -Check`。
@@ -105,9 +105,9 @@ C++ / CMake / shader / 示例改动按需运行最小相关验证。当前根 CM
 - 写入前搜索目标所有者和相关旧表述；优先更新或删除冲突事实，不要在旧结论旁追加一套新结论。
 - 只沉淀稳定、可复用的内容：仓库规则、目录职责、学习流程、验证流程、常见误判和用户在本仓库内反复表达的偏好。
 - 不要沉淀临时猜测、一次性命令输出、未定论争议、聊天闲谈、秘密信息、过窄的实现细节。
-- 按归属选择目标：根规则写入 `AGENTS.zh-CN.md`；长期专项上下文写入 `docs/agents/zh-CN/*.md`；主题状态、复现步骤或验证配方写入 `docs/tasks/zh-CN/*.md`；共享工作流、口令、意图识别规则或跨 Agent 行为写入 `.agents/skills/huli-workflow/SKILL.zh-CN.md`。
-- 可从当前代码或配置直接发现的依赖版本、目标和路径以实时文件为准，不在长期上下文中复制完整清单；一次性环境和验证结果写入带日期、命令和证据的 task 文档。
-- 长任务恢复、证据、TODO 状态和失败探索默认使用 `docs/tasks/zh-CN/study-template.md`。只有用户明确要求文件规划工作流时，才可在被 Git 忽略的 `.planning/<plan-id>/` 中保存本机活动状态；完成后把稳定结论沉淀回 `docs/tasks/zh-CN/`。
+- 按归属选择目标：根规则写入 `AGENTS.zh-CN.md`；长期专项上下文写入 `docs/agents/zh-CN/*.md`；共享工作流、口令、意图识别规则或跨 Agent 行为写入 `.agents/skills/huli-workflow/SKILL.zh-CN.md`。
+- 可从当前代码或配置直接发现的依赖版本、目标和路径以实时文件为准，不在长期上下文中复制完整清单；一次性环境、命令输出和验证结果只在当前任务中汇报，不升级为长期 AI 资料。
+- 默认不为单次或长任务创建仓库内状态文档。只有稳定、可复用且归属明确的结论才更新对应的长期资料；用户明确要求创建某份文档时再按其用途确定位置。
 - 写入前确认依据：用户明确偏好、当前代码事实、已验证命令、可靠外部来源或已落地设计；证据不足时只列候选，不写成规则。
 - 修改中文源后，同步对应英文文件并更新 SHA256 marker。
 - 如果没有足够确定、值得写入的内容，不要改文件，只汇报候选项和不沉淀的理由。
@@ -147,7 +147,7 @@ C++ / CMake / shader / 示例改动按需运行最小相关验证。当前根 CM
 - 只暂存本次任务相关文件，不要默认 `git add .`。
 - 必要验证全部通过后才能正常提交；验证失败时只能在用户明确要求下创建 `chore(wip): ...` 本地兜底提交，且该提交不得推送或创建 PR。
 - commit 标题使用 `<type>(<scope>): <中文简述>`；scope 可省略，破坏性变更在 type/scope 后使用 `!`。
-- commit 正文使用中文并明确列出“变更”“原因”“验证”；存在兼容性或运行风险时再列“风险”。
+- 普通 commit 正文可省略；破坏性变更、`chore(wip)` 或重大兼容性/runtime 风险必须按 `docs/agents/git.md` 补充中文正文。
 - 不要推送、不要创建 PR、不要合并分支。
 - 汇报分支、commit 和验证结果。
 
@@ -159,9 +159,10 @@ C++ / CMake / shader / 示例改动按需运行最小相关验证。当前根 CM
 - 只暂存本次任务相关文件，不要默认 `git add .`。
 - 如果存在未提交改动，先按 `=cm` 规则提交。
 - 当前分支必须是可发布的非默认任务分支；`main` 和 `spike/*` 不通过该命令发布。
+- 运行 `tools/check_pr_policy.py`，确认 PR 与 commit 标题合规且没有不可发布的 WIP commit。
 - PR 标题使用 `<type>(<scope>): <中文简述>`，正文按 `.github/PULL_REQUEST_TEMPLATE.md` 如实填写范围、验证、风险和回滚。
 - 推送当前分支到 `origin`。
-- 创建 GitHub draft PR。
+- 创建 GitHub draft PR，并等待 `quality-gate` 返回明确结果。
 - 不要把 PR 转为 ready、合并 PR 或直推 `main`，除非用户另外明确授权且必要验证已通过。
 - 汇报分支、commit、PR URL 和验证结果。
 
@@ -173,7 +174,6 @@ C++ / CMake / shader / 示例改动按需运行最小相关验证。当前根 CM
 
 - `AGENTS.zh-CN.md` -> `AGENTS.md`
 - `docs/agents/zh-CN/*.md` -> `docs/agents/*.md`
-- `docs/tasks/zh-CN/*.md` -> `docs/tasks/*.md`
 - `.agents/skills/huli-workflow/SKILL.zh-CN.md` -> `.agents/skills/huli-workflow/SKILL.md`
 
 每次修改任一中文源后，必须同步对应英文文件：

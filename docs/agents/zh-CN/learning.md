@@ -1,30 +1,18 @@
 # Huli Learning Context
 
-只在学习计划、章节笔记、复现实验、概念解释或长期状态沉淀任务中加载本文件。
+只在学习方法、章节理解、复现实验、概念解释或长期知识沉淀任务中加载本文件。
 
-## 学习记录归属
+## 学习资料归属
 
 - 长期通用规则：`AGENTS.zh-CN.md`
 - 长期专项上下文：`docs/agents/zh-CN/*.md`
-- 单个主题的学习状态、复现步骤、验证记录：`docs/tasks/zh-CN/*.md`
 - 共享工作流和口令识别：`.agents/skills/huli-workflow/SKILL.zh-CN.md`
 
-## 主题状态建议
+## 沉淀边界
 
-每个学习主题优先使用 `docs/tasks/zh-CN/study-template.md` 的形状：
-
-- 当前事实
-- Top next action
-- Active items
-- Evidence
-- Failed explorations
-- Validation
-
-## 活动规划与长期沉淀
-
-- `docs/tasks/zh-CN/` 保存可提交、可复用的主题状态、复现步骤和验证配方。
-- 默认不要创建平行状态目录。用户明确要求文件规划工作流时，可以使用被 Git 忽略的 `.planning/<plan-id>/task_plan.md`、`findings.md` 和 `progress.md` 保存本机活动状态。
-- 活动计划完成后，把仍有长期价值的事实、验证入口和失败经验整理到对应 `docs/tasks/zh-CN/*.md`；不要直接提交会话流水账。
+- 默认不为单个学习主题创建仓库内任务或状态文档；活动状态留在当前对话中。
+- 只有长期有效的学习方法、常见误判和可复用验证规则才更新对应的 `docs/agents/zh-CN/*.md`。
+- 一次性实验、命令输出、临时 TODO 和失败过程只在当前任务中汇报，除非用户明确要求创建文档。
 - 不要在仓库正式文档中硬编码某个用户的本地 skill 安装路径。
 
 ## 教学风格

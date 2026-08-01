@@ -42,31 +42,27 @@
 
 破坏性变更在 type 或 scope 后添加 `!`，并在正文增加 `BREAKING CHANGE:` 说明。
 
-commit 正文使用中文，至少包含：
+普通本地 commit 正文可以省略；完整的范围、验证、风险和回滚记录统一写进 PR Description。以下情况必须写中文正文：
 
-```text
-变更：
-- ...
+- breaking change：增加 `BREAKING CHANGE:` 并说明影响与迁移。
+- `chore(wip): ...` 本地兜底：记录失败命令和阻断原因，且不得发布。
+- 重大兼容性、Vulkan runtime 或回滚风险：说明风险和缓解方式。
 
-原因：
-- ...
-
-验证：
-- <命令> — <结果>
-```
-
-存在兼容性、运行时或回滚风险时补充“风险”一节。不要把未执行的检查写成已通过。
+不要把未执行的检查写成已通过。
 
 ## 验证
 
 提交前必须按改动范围完成必要验证：
 
 - 所有改动：检查完整 diff、未跟踪文件，并在暂存后运行 `git diff --cached --check`。
+- 发布前：运行 `python3 ./tools/check_pr_policy.py --title "<PR 标题>" --base <base>`，检查 PR/commit 标题和不可发布 WIP commit。
 - Agent 文档或 skill：macOS / Linux 运行 `python3 ./tools/sync-agents.py --check`，Windows PowerShell 运行 `.\tools\sync-agents.ps1 -Check`；确认中英文含义一致。
 - C++ / CMake / shader / 示例 / 工具：按 `docs/agents/build.md` 与 `docs/agents/formatting.md` 运行相关格式、配置、编译或测试。
 - Vulkan 运行行为：单独执行 runtime smoke；编译链接成功不等于运行验证通过，需记录首个 validation error / VUID。
 
 高相关验证无法执行时，在 PR 中写明原因、未覆盖范围和风险。必要验证失败时不得正常提交或发布。只有明确需要本地防丢检查点时，才可使用 `chore(wip): ...`；正文记录失败命令和阻断原因，该提交不得 push 或创建 PR。
+
+GitHub 的 `quality-gate` 会固定检查标题/WIP、PR diff、Agent 中英文同步和 CMake preset 解析。它不替代本地构建或 Vulkan runtime smoke。
 
 ## Pull Request
 
@@ -76,8 +72,10 @@ Huli 默认 PR-first；不要直接向 `main` 推送。
 2. 使用 `<type>(<scope>): <中文简述>` 作为 PR 标题。
 3. Review 完整 diff，排除凭证、无关生成文件、意外资源或不相关用户改动。
 4. 按 `.github/PULL_REQUEST_TEMPLATE.md` 填写摘要、包含/不包含范围、用户可见变化、实际验证、未验证项、风险和回滚。
-5. 默认创建 draft PR；必要验证通过并补全说明后，再由维护者决定是否转为 ready。
-6. 等待 review；未经明确授权，不合并 PR、直推 `main` 或执行发布。
+5. 默认创建 draft PR，并等待 `quality-gate`；必要验证通过且说明完整后，再由维护者决定是否转为 ready。
+6. `main` 只使用 Squash merge；未经明确授权，不合并 PR、直推 `main` 或执行发布。
+
+Huli 的远端仓库只开启 Squash merge，Squash 标题使用 PR Title、正文使用 PR Description，并在合并后自动删除任务分支。`main` 要求 PR 和 strict `quality-gate`，但单人维护不要求他人批准。
 
 ## Review
 

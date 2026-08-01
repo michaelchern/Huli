@@ -1,0 +1,58 @@
+name: PR Quality
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - edited
+      - reopened
+      - synchronize
+      - ready_for_review
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-quality-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  quality-gate:
+    name: quality-gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Check out pull-request head
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Test PR policy checker
+        run: python3 -m unittest discover -s tools/tests
+
+      - name: Check PR and commit subjects
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: >-
+          python3 ./tools/check_pr_policy.py
+          --title "$PR_TITLE"
+          --base "$BASE_SHA"
+          --head "$HEAD_SHA"
+
+      - name: Check pull-request diff
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: git diff --check "$BASE_SHA...$HEAD_SHA"
+
+      - name: Check Agent document synchronization
+        run: python3 ./tools/sync-agents.py --check
+
+      - name: Check CMake presets
+        run: cmake --list-presets=all

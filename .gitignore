@@ -1,13 +1,15 @@
-# Build trees
+# 构建目录 / Build trees
 /[Bb]uild/
 /[Bb]uild-*/
 /[Oo]ut/
 /cmake-build-*/
 
-# Local tool caches
+# 本地工具缓存 / Local tool caches
 /.cache/
+__pycache__/
+*.py[cod]
 
-# CMake user-local and generated state
+# CMake 用户本地配置和生成状态 / CMake user-local and generated state
 /CMakeUserPresets.json
 /CMakeLists.txt.user
 /CMakeCache.txt
@@ -23,7 +25,7 @@
 /.ninja_deps
 /.ninja_log
 
-# Visual Studio local state
+# Visual Studio 本地状态 / Visual Studio local state
 /.vs/
 /CppProperties.json
 *.suo
@@ -41,7 +43,7 @@
 *.VC.VC.opendb
 ipch/
 
-# Temporary and backup files
+# 临时文件和备份文件 / Temporary and backup files
 *~
 *.bak
 *.bkp
@@ -51,7 +53,7 @@ ipch/
 *.tmp
 ~$*
 
-# Operating-system metadata
+# 操作系统元数据 / Operating-system metadata
 .DS_Store
 .DS_Store?
 ._*
@@ -61,7 +63,7 @@ Desktop.ini
 ehthumbs.db
 Thumbs.db
 
-# Huli-local planning state; remove this section when a copied project does not use it.
+# Huli 本地规划状态；复制后的项目不使用此功能时，请移除此节。 / Huli-local planning state; remove this section when a copied project does not use it.
 /.planning/
 
-# Add package-manager, coverage, generated-asset, or other IDE rules only when a project uses them.
+# 仅当项目实际使用时，才添加包管理器、覆盖率、生成资源或其他 IDE 规则。 / Add package-manager, coverage, generated-asset, or other IDE rules only when a project uses them.

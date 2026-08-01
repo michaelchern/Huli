@@ -2,11 +2,12 @@
 
 只在 `=br`、`=gc`、`=cm`、`=gh`、分支、提交、推送、PR、review 或发布检查任务中加载本文件。
 
-本流程参考 `makecindy/cindy` 的 `main@9254c053`（2026-07-31），学习其 PR-first、Conventional Commit、验证门禁、风险披露和 review 思路，并按 Huli 的 C++20 / Vulkan 学习仓库边界调整。不引入 DCO、自动 Code Review 或新的构建 CI。
+本流程参考 `makecindy/cindy` 的 `main@9254c053`（2026-07-31），学习其 PR-first、Conventional Commit、验证门禁、风险披露和 review 思路，并按 Huli 的 C++20 / Vulkan 学习仓库边界调整。Huli 只增加轻量 `quality-gate`，不引入 DCO、自动 Code Review 或完整 Vulkan 构建 CI。
 
 ## 交付原则
 
 - 默认 PR-first：代码和文档从非默认分支通过 PR 进入 `main`。
+- `main` 只接受 Squash merge；PR 不要求他人批准，但必须通过 `quality-gate`，且合并后自动删除任务分支。
 - 一个分支、commit 或 PR 只处理一个清晰目标，避免混入顺手修复和无关生成文件。
 - 已有任务分支、worktree 和未提交改动优先保留；不要为了套流程而移动、stash、reset、clean 或回滚现有工作。
 - 未经用户明确授权，不直推 `main`、把 draft PR 转为 ready、合并 PR 或执行发布。
@@ -55,29 +56,26 @@ commit 和 PR 标题统一使用：
 - 破坏性变更在 type 或 scope 后添加 `!`，例如 `feat(render)!: 调整材质绑定接口`，并在正文增加 `BREAKING CHANGE:` 段说明影响与迁移方式。
 - `spike` 不是可发布标题 type；实验结论要发布时，应按最终交付性质改用正式 type。
 
-commit 正文必须使用中文并包含：
+普通本地 commit 只强制标题格式，正文可以省略。完整的变更范围、验证结果、未验证项、风险和回滚说明以 PR Description 为权威记录。
 
-```text
-变更：
-- ...
+以下情况必须写中文正文：
 
-原因：
-- ...
+- 破坏性变更：增加 `BREAKING CHANGE:`，说明影响与迁移方式。
+- `chore(wip): ...` 本地兜底提交：记录失败命令和阻断原因。
+- 存在重大兼容性、Vulkan runtime 或回滚风险：说明风险与缓解方式。
 
-验证：
-- <命令> — <结果>
-```
-
-存在兼容性、运行时或回滚风险时，再增加“风险”一节。不要把未执行的验证写成已通过。
+无论 commit 是否有正文，都不要把未执行的验证写成已通过；Agent 必须在当前任务回复中汇报实际验证结果。
 
 ## 验证门禁
 
 - 暂存前检查完整 diff 和未跟踪文件；暂存后运行 `git diff --cached --check`。
+- 发布前运行 `python3 ./tools/check_pr_policy.py --title "<PR 标题>" --base <base>`，检查 PR 标题、PR 范围内的非 merge commit 标题和不可发布 WIP commit。
 - 修改 Agent 文档或 skill 时运行平台适用的同步检查：macOS / Linux 使用 `python3 ./tools/sync-agents.py --check`，Windows PowerShell 使用 `.\tools\sync-agents.ps1 -Check`；并确认中英文含义一致。
 - 修改 C++、CMake、shader、示例或工具时，按 `docs/agents/build.md` 和 `docs/agents/formatting.md` 运行最小相关格式、配置、编译或测试验证。
 - 涉及 Vulkan 运行行为时，编译链接成功不等于运行验证通过；单独运行 runtime smoke，并报告首个 validation error / VUID。
 - 某项高相关验证无法执行时，必须说明原因、未覆盖范围和风险；是否属于“必要验证”按改动类型与当前平台能力判断。
 - 必要验证失败时，`=cm` 和 `=gh` 都必须停止。用户明确要求防丢数据或保留检查点时，可创建标题为 `chore(wip): <中文简述>` 的本地提交；正文必须记录失败命令和阻断原因，且不得 push 或创建 PR。
+- GitHub 的 `quality-gate` 固定检查标题/WIP、PR diff、Agent 中英文同步和 CMake preset 解析。它是轻量仓库门禁，不替代按改动风险执行的本地构建或 Vulkan runtime smoke。
 
 ## `=br <用途>` 创建分支
 
@@ -112,7 +110,7 @@ commit 正文必须使用中文并包含：
 2. 确认当前改动只服务一个清晰目标；只暂存本次意图明确的文件，不要默认 `git add .`。
 3. 暂存后检查 `git diff --cached` 和 `git diff --cached --check`，确认没有误纳无关改动。
 4. 运行所有必要验证；任何必要验证失败都停止正常提交流程。
-5. 使用 `<type>(<scope>): <中文简述>` 标题和“变更 / 原因 / 验证”中文正文提交；有风险时补充“风险”，有破坏性变更时补充 `BREAKING CHANGE:`。
+5. 使用 `<type>(<scope>): <中文简述>` 标题提交。普通 commit 正文可省略；破坏性变更、`chore(wip)` 或重大兼容性/runtime 风险按“Commit 与 PR 标题”一节补正文。
 6. 用户明确要求在验证失败时保存本地检查点，才可使用 `chore(wip): ...`；创建后明确标记为不可发布。
 7. 创建本地提交后停止。
 8. 汇报分支、commit hash、纳入文件和验证结果。
@@ -122,12 +120,19 @@ commit 正文必须使用中文并包含：
 1. 运行 `git status --short --branch`，检查完整 diff、未跟踪文件和已有用户改动。
 2. 当前分支必须是可发布的非默认任务分支；如果位于 `main` 或 `spike/*`，停止并要求先使用合适的任务分支。
 3. 如有未提交改动，按 `=cm` 规则只暂存目标文件、完成必要验证并创建本地提交。
-4. 确认所有待发布 commit 都不是 `chore(wip): ...`，必要验证全部通过，改动只服务一个 PR 目标。
+4. 运行 PR policy checker，确认所有待发布 commit 标题合规且没有 `wip:` / `chore(wip): ...`，必要验证全部通过，改动只服务一个 PR 目标。
 5. PR 标题使用 `<type>(<scope>): <中文简述>`；多 commit PR 按整体交付结果拟定，不机械复制最后一个 commit 标题。
 6. 按 `.github/PULL_REQUEST_TEMPLATE.md` 如实填写摘要、包含/不包含范围、用户可见变化、实际验证、未验证项、风险和回滚方式。
-7. 推送当前分支到 `origin`，创建 GitHub draft PR。
-8. 不要自动转为 ready、合并 PR 或直推 `main`；这些动作需要用户另外明确授权，且必要验证必须通过。
-9. 汇报分支、commit hash、PR URL、验证结果、未验证范围和主要风险。
+7. 推送当前分支到 `origin`，创建 GitHub draft PR，并等待 `quality-gate` 返回明确结果。
+8. 不要自动转为 ready、Squash merge 或直推 `main`；这些动作需要用户另外明确授权，且必要验证与 `quality-gate` 必须通过。
+9. 汇报分支、commit hash、PR URL、`quality-gate`、本地验证、未验证范围和主要风险。
+
+## GitHub 远端基线
+
+- 仓库只开启 Squash merge；Squash 标题取 PR Title，正文取 PR Description，关闭 merge commit 和 rebase merge，并在合并后自动删除任务分支。
+- `main` 必须通过 PR 更新；批准人数为 `0`，便于单人维护，但仓库所有者同样受保护规则约束。
+- `quality-gate` 是必需且 strict 的状态检查，分支必须基于最新 `main`；`main` 同时要求线性历史，并禁止 force-push 和删除。
+- 不要求 DCO、commit signature、CODEOWNERS、他人 review 或 review 对话解决。紧急绕过应临时、显式修改保护规则，不保留默认 bypass。
 
 ## Review 严重度
 
@@ -144,5 +149,5 @@ Review 必须先读适用的 Huli 规则和完整 diff，再报告有证据支�
 - 不要提交凭证、令牌、授权文件、个人数据或无意加入的生成文件。
 - `=cm` 绝不推送、创建 PR 或合并分支。
 - `=gh` 默认只创建 draft PR。
-- 必要验证失败或存在 `chore(wip): ...` commit 时不得发布。
+- 必要验证失败、`quality-gate` 失败或存在 WIP commit 时不得发布。
 - 未经用户明确授权，不直推 `main`、把 draft PR 转为 ready、合并 PR 或执行发布。
