@@ -42,31 +42,27 @@ Commit and PR subjects use:
 
 Add `!` after the type or scope for a breaking change and explain it in a `BREAKING CHANGE:` body section.
 
-Commit bodies are written in Chinese and use these headings:
+Normal local commit bodies are optional; the PR Description is the single complete record for scope, validation, risk, and rollback. A Chinese body is required for:
 
-```text
-变更：
-- ...
+- Breaking changes: add `BREAKING CHANGE:` with impact and migration guidance.
+- Local `chore(wip): ...` checkpoints: record the failed command and blocker, and never publish them.
+- Material compatibility, Vulkan runtime, or rollback risk: describe the risk and mitigation.
 
-原因：
-- ...
-
-验证：
-- <command> — <result>
-```
-
-Add a risk section for compatibility, runtime, or rollback concerns. Never claim an unexecuted check passed.
+Never claim an unexecuted check passed.
 
 ## Verification
 
 Complete the checks required by the change before committing:
 
 - Every change: review the complete diff and untracked files, then run `git diff --cached --check` after staging.
+- Before publication: run `python3 ./tools/check_pr_policy.py --title "<PR title>" --base <base>` to check PR/commit subjects and unpublished WIP commits.
 - Agent documentation or skills: run `python3 ./tools/sync-agents.py --check` on macOS / Linux, or `.\tools\sync-agents.ps1 -Check` in Windows PowerShell. Confirm that the Chinese and English meanings agree.
 - C++, CMake, shader, example, or tool changes: follow `docs/agents/build.md` and `docs/agents/formatting.md` for relevant formatting, configure, build, or test checks.
 - Vulkan runtime behavior: run a separate runtime smoke. Successful compilation and linking do not prove runtime validation; record the first validation error or VUID.
 
 If a highly relevant check cannot run, explain why, the uncovered scope, and the risk in the PR. Failed required validation blocks normal commits and publication. Only an explicitly needed local data-preservation checkpoint may use `chore(wip): ...`; record the failed command and blocker in the body, and never push or open a PR from that commit.
+
+GitHub `quality-gate` always checks subjects/WIP, the PR diff, Agent-document synchronization, and CMake preset parsing. It does not replace local builds or Vulkan runtime smoke.
 
 ## Pull Requests
 
@@ -76,8 +72,10 @@ Huli is PR-first by default. Do not push directly to `main`.
 2. Use `<type>(<scope>): <Chinese short description>` for the PR title.
 3. Review the complete diff and exclude credentials, unrelated generated files, accidental assets, and unrelated user changes.
 4. Complete `.github/PULL_REQUEST_TEMPLATE.md` with the summary, included/excluded scope, user-visible behavior, actual checks, omitted checks, risks, and rollback.
-5. Open a draft PR by default. After required validation passes and the description is complete, a maintainer decides whether to mark it ready.
-6. Wait for review. Do not merge, push directly to `main`, or publish without explicit authorization.
+5. Open a draft PR by default and wait for `quality-gate`. After required validation passes and the description is complete, a maintainer decides whether to mark it ready.
+6. `main` uses Squash merge only. Do not merge, push directly to `main`, or publish without explicit authorization.
+
+The remote repository enables Squash merge only, uses the PR Title and Description as the Squash subject and body, and deletes merged task branches automatically. `main` requires a PR and strict `quality-gate`, but solo maintenance does not require another person's approval.
 
 ## Review
 

@@ -9,7 +9,7 @@
 - 格式化、clang-format、clang-tidy：`docs/agents/formatting.md`
 - codegraph、符号查找、调用链、影响面：`docs/agents/codegraph.md`
 - Vulkan 概念、验证层、GPU 调试：`docs/agents/vulkan.md`
-- 学习笔记、主题状态、复现记录：`docs/agents/learning.md`
+- 学习方法、概念解释、复现建议：`docs/agents/learning.md`
 
 ## 默认流程
 

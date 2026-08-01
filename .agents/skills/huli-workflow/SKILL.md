@@ -2,7 +2,7 @@
 name: huli-workflow
 description: Vendor-neutral workflow for AI agents working in the Huli C++ Vulkan learning repository. Use when an agent edits this repo, handles =sa/=ca/=ai/=br/=gc/=cm/=gh commands, or needs routing to branches, builds, GitHub, formatting, Vulkan, or learning context.
 ---
-<!-- HULI_WORKFLOW_SKILL_ZH_CN_SHA256: d951c094ea6a0e28034a38aea41586900739767d1fc10ebaaaa1548840a84ed5 -->
+<!-- HULI_WORKFLOW_SKILL_ZH_CN_SHA256: da04b65b7e1b78e53de491db9bed9ccab0db276580631a3cb2993e0fb9948f51 -->
 
 # Huli Workflow
 
@@ -31,10 +31,10 @@ For `=sa` and `=ca`, use the platform-appropriate sync checker: `python3 ./tools
 Git delivery follows this contract; `docs/agents/git.md` is authoritative:
 
 - Use PR-first delivery by default. One branch and PR handle one clear goal, while existing task branches, worktrees, and uncommitted changes take precedence.
-- Commit and PR subjects use `<type>(<scope>): <Chinese short description>` with optional scope. Commit bodies are in Chinese and state the changes, reason, and verification.
+- Commit and PR subjects use `<type>(<scope>): <Chinese short description>` with optional scope. Normal commit bodies are optional; breaking changes, WIP, or material risk require a Chinese body, while the PR Description carries full validation and risk.
 - `=gc` checks the complete diff, untracked files, intended scope, validation results, omitted checks, and risks.
 - `=cm` stages only task files and creates a local commit only after required validation passes. A failed-validation checkpoint must be `chore(wip): ...` and cannot be published.
-- `=gh` creates a draft PR only from a publishable non-default task branch and completes the PR template with scope, verification, risk, and rollback.
+- `=gh` creates a draft PR only from a publishable non-default task branch, runs the PR policy checker, completes the PR template with scope, verification, risk, and rollback, and waits for `quality-gate`.
 
 For `=ai`:
 
@@ -45,9 +45,8 @@ For `=ai`:
 5. Write to the right owner:
    - Root repository rules: `AGENTS.zh-CN.md`.
    - Long-lived domain context: `docs/agents/zh-CN/*.md`.
-   - Topic state, reproduction steps, and validation recipes: `docs/tasks/zh-CN/*.md`.
    - Shared workflow, commands, intent recognition, and cross-agent behavior: `.agents/skills/huli-workflow/SKILL.zh-CN.md`.
-6. Treat dynamic facts discoverable from code or configuration as live-file data. Put one-off environments and validation results in dated task documents with evidence instead of copying them into long-lived context.
+6. Treat dynamic facts discoverable from code or configuration as live-file data. Report one-off environments, command output, and validation results only in the current task instead of copying them into long-lived context.
 7. Confirm evidence before writing: explicit user preferences, current code, reliable external sources, verified commands, or settled designs.
 8. After changing a Chinese source, sync the English AI-facing file and run the platform-appropriate check: `python3 ./tools/sync-agents.py --check` on macOS / Linux, or `.\tools\sync-agents.ps1 -Check` in Windows PowerShell.
 
@@ -69,7 +68,7 @@ For `=gc`, `=cm`, and `=gh`, also read `docs/agents/git.md` before acting.
 - GitHub publish/PR/commit: `docs/agents/git.md`
 - Formatting/style: `docs/agents/formatting.md`
 - Vulkan concepts and debugging: `docs/agents/vulkan.md`
-- Study notes and topic state: `docs/agents/learning.md`
+- Learning methods and concept explanations: `docs/agents/learning.md`
 
 If a context pack is missing, inspect source files directly and keep the answer explicit about assumptions.
 
@@ -83,13 +82,13 @@ If a context pack is missing, inspect source files directly and keep the answer 
 
 - No textbook or reference repository is currently fixed. Do not assume an external path exists.
 - State the source, version, and learning purpose when using external material.
-- Huli experiments, notes, and task state go into the Huli repository.
+- Learning conclusions and reusable rules worth preserving for Huli go into the Huli repository.
 
 ## AI Material and Skill Design
 
-- Keep Huli routing thin: root `AGENTS` only holds entry rules, long-lived domain context lives in `docs/agents/zh-CN/`, short task checklists and topic state live in `docs/tasks/zh-CN/`, and skills carry only strongly triggered workflows and intent recognition.
+- Keep Huli routing thin: root `AGENTS` only holds entry rules, long-lived domain context lives in `docs/agents/zh-CN/`, and skills carry only strongly triggered workflows and intent recognition.
 - Do not copy Horizon or other repository AI frameworks wholesale. Before borrowing, compare repository goal, language source, sync mechanism, context size, and drift risk.
-- For multi-turn or long-running work, use `docs/tasks/zh-CN/study-template.md` by default. When the user explicitly requests a file-planning workflow, Git-ignored `.planning/<plan-id>/` may hold local active state; distill only stable results into `docs/tasks/zh-CN/` afterward.
+- Do not create repository state documents for individual or long-running tasks by default; keep active state in the current conversation. Add a document only when the user explicitly requests one, and place stable, reusable conclusions in long-lived material with a clear owner.
 - Do not write local optional-skill installation paths into project rules or commit raw session logs as long-lived knowledge.
 - Add a new skill only when there is a clear trigger phrase, repeated workflow, or frequent-misread risk; every skill must have an accurate frontmatter `description`.
 
@@ -98,7 +97,7 @@ If a context pack is missing, inspect source files directly and keep the answer 
 - Do not revert user changes unless explicitly asked.
 - Do not stage unrelated files.
 - Do not default to `git add .`.
-- Do not normally commit or publish failed required validation. An explicitly authorized `chore(wip): ...` checkpoint stays local.
+- Do not normally commit or publish failed required validation or `quality-gate`. An explicitly authorized `chore(wip): ...` checkpoint stays local.
 - Do not push directly to `main`, mark a draft PR ready, or merge a PR without explicit user authorization.
 - Do not modify external repositories outside the user's requested scope.
 - Use `SKILL.zh-CN.md` for Chinese skill sources; do not place Chinese sources at `zh-CN/SKILL.md`, because many agents discover every `SKILL.md` as a separate skill.

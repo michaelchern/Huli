@@ -170,7 +170,6 @@ $syncPairs = @(
     New-SyncPair "AGENTS.zh-CN.md" "AGENTS.md" "AGENTS_ZH_CN_SHA256" "root AGENTS"
 )
 $syncPairs += Get-DocumentPairs "docs/agents/zh-CN" "docs/agents" "AGENT_DOCS" "agent context"
-$syncPairs += Get-DocumentPairs "docs/tasks/zh-CN" "docs/tasks" "TASK_DOCS" "task document"
 $syncPairs += Get-SkillPairs
 
 $knownTargets = @{}
@@ -180,7 +179,6 @@ foreach ($pair in $syncPairs) {
 
 $orphanedTargets = @()
 $orphanedTargets += Get-OrphanedEnglishDocuments "docs/agents" $knownTargets
-$orphanedTargets += Get-OrphanedEnglishDocuments "docs/tasks" $knownTargets
 $orphanedTargets += Get-OrphanedEnglishSkills $knownTargets
 
 function Get-SyncState {

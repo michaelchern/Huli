@@ -1,8 +1,8 @@
 # Huli Agent Entry
-<!-- AGENTS_ZH_CN_SHA256: 6aee83ad8c8cd369c7879c8e8eeb6d01b916497bc9e7abd9aea7c19127f5d49d -->
+<!-- AGENTS_ZH_CN_SHA256: 187a24779602f4fc687aec66ebd7b2e2fa184687c653cae95d7cf3678173a607 -->
 
 > `AGENTS.zh-CN.md` is the Chinese source for the root AI entry.
-> Other Chinese sources live in `docs/agents/zh-CN/`, `docs/tasks/zh-CN/`, and `.agents/skills/*/SKILL.zh-CN.md`.
+> Other Chinese sources live in `docs/agents/zh-CN/` and `.agents/skills/*/SKILL.zh-CN.md`.
 > English files are the default AI entrypoints and must stay aligned with Chinese sources.
 
 ## 1. Core Rules
@@ -15,7 +15,7 @@ When working in this repository:
 - Keep context narrow. Do not load Vulkan, build, and Git context all at once unless the task needs it.
 - Check `git status --short --branch` before editing.
 - Never revert user changes unless explicitly asked.
-- Use PR-first delivery by default: code and documentation enter `main` through a PR from a non-default branch. Never publish failed validation. Do not push directly to `main` or merge a PR without explicit user authorization.
+- Use PR-first delivery by default: code and documentation enter `main` through a Squash merge from a non-default branch. PRs must pass the lightweight `quality-gate`. Never publish failed validation. Do not push directly to `main` or merge a PR without explicit user authorization.
 - Treat the live `CMakeLists.txt` and source tree as authoritative. Do not assume that study material, experiment targets, or runtime entrypoints have been connected to the root build.
 - Keep Huli learning artifacts in this repository. When using external material, state its source and learning purpose instead of copying large sections without explanation.
 - Report verification commands and results for every meaningful change. Docs-only changes normally need sync and diff checks only.
@@ -30,7 +30,7 @@ Load only what the task needs:
 - Formatting, clang-format, clang-tidy: `docs/agents/formatting.md`
 - Codegraph, symbol flow, call chains, refactor impact: `docs/agents/codegraph.md`
 - Vulkan concepts, debugging, validation layers, GPU symptom explanation: `docs/agents/vulkan.md`
-- Study notes, topic state, understanding and reproduction records: `docs/agents/learning.md`
+- Learning methods, concept explanations, and reproduction guidance: `docs/agents/learning.md`
 
 Shared project agent skills:
 
@@ -42,11 +42,11 @@ These skills are plain Markdown and vendor-neutral; they are not Codex-specific.
 
 - `CMakeLists.txt`: root build entrypoint and live authority for dependency versions; it currently builds dependencies, `huli_vulkan`, `huli_render`, and `huli_example1` on non-Android desktop platforms.
 - `docs/agents/`: on-demand AI context packs.
-- `docs/tasks/`: short task checklists, topic study state, reproduction steps, and validation recipes.
 - `.agents/skills/`: shared project agent skills.
 - `CONTRIBUTING.md`: contributor-facing entrypoint for branches, commits, validation, and PR delivery.
 - `.github/PULL_REQUEST_TEMPLATE.md`: GitHub PR template for scope, verification, risk, and rollback.
-- `tools/`: agent sync scripts and future lightweight tools.
+- `.github/workflows/pr-quality.yml`: lightweight PR gate for subjects, WIP, diff, Agent synchronization, and CMake presets.
+- `tools/`: Agent sync scripts, the PR policy checker, and future lightweight tools.
 
 ## 4. Default Validation
 
@@ -83,7 +83,7 @@ These commands use the `=` prefix to avoid conflicts with slash commands and men
 Sync all English agent files from Chinese sources.
 
 - Do not modify Chinese source files.
-- Sync scope includes root `AGENTS.md`, `docs/agents/*.md`, `docs/tasks/*.md`, and project skills.
+- Sync scope includes root `AGENTS.md`, `docs/agents/*.md`, and project skills.
 - Preserve the same section structure; English should stay short, direct, and AI-context friendly.
 - Update sync markers near the top of matching English files.
 - Run the platform-appropriate sync check: `python3 ./tools/sync-agents.py --check` on macOS / Linux, or `.\tools\sync-agents.ps1 -Check` in Windows PowerShell.
@@ -106,9 +106,9 @@ Distill durable Huli learning context from this or recent AI conversations into 
 - Search the owning document and related old statements before writing. Update or remove conflicting facts instead of appending a second version beside them.
 - Preserve only stable, reusable content: repository rules, directory responsibilities, learning workflow, validation workflows, common misreads, and recurring user preferences in this repo.
 - Do not preserve temporary guesses, one-off command output, unresolved debates, casual chat, secrets, or overly narrow implementation details.
-- Choose the target by ownership: root rules go in `AGENTS.zh-CN.md`; long-lived focused context goes in `docs/agents/zh-CN/*.md`; topic state, reproduction steps, or validation recipes go in `docs/tasks/zh-CN/*.md`; shared workflow, commands, intent-recognition rules, or cross-agent behavior go in `.agents/skills/huli-workflow/SKILL.zh-CN.md`.
-- Treat live code and configuration as authoritative for discoverable dependency versions, targets, and paths; put one-off environments and validation results in task documents with dates, commands, and evidence.
-- By default, use `docs/tasks/zh-CN/study-template.md` for long-task recovery, evidence, TODO state, and failed explorations. Only when the user explicitly requests a file-planning workflow may local active state live in Git-ignored `.planning/<plan-id>/`; distill stable results back into `docs/tasks/zh-CN/` afterward.
+- Choose the target by ownership: root rules go in `AGENTS.zh-CN.md`; long-lived focused context goes in `docs/agents/zh-CN/*.md`; shared workflow, commands, intent-recognition rules, or cross-agent behavior go in `.agents/skills/huli-workflow/SKILL.zh-CN.md`.
+- Treat live code and configuration as authoritative for discoverable dependency versions, targets, and paths. Report one-off environments, command output, and validation results only in the current task instead of promoting them to long-lived AI material.
+- Do not create repository state documents for individual or long-running tasks by default. Update long-lived material only with stable, reusable conclusions that have a clear owner; if the user explicitly requests a document, choose its location from its purpose.
 - Confirm the evidence before writing: explicit user preferences, current code facts, verified commands, reliable external sources, or settled designs. If evidence is weak, report candidates instead of turning them into rules.
 - After changing a Chinese source, sync the matching English file and update the SHA256 marker.
 - If nothing is certain or valuable enough to preserve, do not edit files; report candidates and why they were not preserved.
@@ -148,7 +148,7 @@ Commit current intended changes to the current local branch only.
 - Stage only files related to the current task; do not default to `git add .`.
 - Complete all required validation before a normal commit. If validation fails, only an explicitly requested local `chore(wip): ...` checkpoint is allowed, and it must never be pushed or opened as a PR.
 - Use `<type>(<scope>): <Chinese short description>` for the subject; scope is optional, and breaking changes add `!` after the type or scope.
-- Write the body in Chinese with explicit “changes,” “reason,” and “verification” sections; add “risk” when compatibility or runtime risk exists.
+- Normal commit bodies are optional. Breaking changes, `chore(wip)`, or material compatibility/runtime risks require a Chinese body under `docs/agents/git.md`.
 - Do not push, create a PR, or merge branches.
 - Report branch, commit, and validation results.
 
@@ -160,9 +160,10 @@ Commit current intended changes and publish them to a GitHub PR.
 - Stage only files related to the current task; do not default to `git add .`.
 - If uncommitted changes exist, commit them first using the `=cm` rules.
 - The current branch must be a publishable non-default task branch; `main` and `spike/*` cannot be published by this command.
+- Run `tools/check_pr_policy.py` and confirm that PR and commit subjects conform and no unpublished WIP commit is present.
 - Use `<type>(<scope>): <Chinese short description>` for the PR title and complete `.github/PULL_REQUEST_TEMPLATE.md` truthfully with scope, verification, risk, and rollback.
 - Push the current branch to `origin`.
-- Open a GitHub draft PR.
+- Open a GitHub draft PR and wait for an explicit `quality-gate` result.
 - Do not mark the PR ready, merge it, or push directly to `main` unless the user separately authorizes the action and required validation has passed.
 - Report branch, commit, PR URL, and validation results.
 
@@ -174,7 +175,6 @@ Sync relationships:
 
 - `AGENTS.zh-CN.md` -> `AGENTS.md`
 - `docs/agents/zh-CN/*.md` -> `docs/agents/*.md`
-- `docs/tasks/zh-CN/*.md` -> `docs/tasks/*.md`
 - `.agents/skills/huli-workflow/SKILL.zh-CN.md` -> `.agents/skills/huli-workflow/SKILL.md`
 
 Whenever any Chinese source changes, update its matching English file:
